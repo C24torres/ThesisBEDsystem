@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AdminLTE 3 | Dashboard</title>
 
-  <?php include '../BEDgrading/pages/dashboard/index.php' ?>
+  <?php include './pages/dashboard/index.php' ?>
 
 </body>
 </html>
