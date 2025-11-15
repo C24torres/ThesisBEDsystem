@@ -2,12 +2,12 @@
 session_start();
 ob_start();
 
-include './includes/conn.php';
+include 'conn.php';
 
 if (isset($_SESSION['role'])) {
 
 } else {
-    header("location: pages/login/login.php");
+    header("location: ./pages/login/login.php");
 }
 
 $acad_year = mysqli_query($conn, "SELECT * FROM tbl_active_acadyears

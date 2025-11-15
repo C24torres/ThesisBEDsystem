@@ -1,11 +1,11 @@
 <?php
-require './includes/conn.php';
+require '../../includes/conn.php';
 ob_start();
 session_start();
 
 
 if (isset($_SESSION['role'])) {
-    header("location: pages/dashboard/index.php");
+    header("location: ../dashboard/index.php");
 } 
 
 

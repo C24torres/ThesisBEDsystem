@@ -1,5 +1,5 @@
 <?php
-require './includes/session.php';
+require '../../includes/session.php';
 ?>
 
 
@@ -11,16 +11,16 @@ require './includes/session.php';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard | ONgrade BED</title>
 
-  <?php include './includes/links.php' ?>
+  <?php include '../../includes/links.php' ?>
 
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
   <div class="wrapper">
 
-    <?php include './includes/navbar.php' ?>
+    <?php include '../../includes/navbar.php' ?>
 
-    <?php include './includes/sidebar.php' ?>
+    <?php include '../../includes/sidebar.php' ?>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -50,7 +50,7 @@ require './includes/session.php';
             <div class="small-box bg-success">
               <div class="inner">
                 <?php
-                $total_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semesters]'");
+                $total_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
                 $total = mysqli_num_rows($total_stud);
                 ?>
                 <h3>
@@ -139,7 +139,7 @@ require './includes/session.php';
     <!-- /.content -->
   </div>
 
-      <?php include './includes/footer.php'; ?>
+      <?php include '../../includes/footer.php'; ?>
 
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
@@ -149,7 +149,7 @@ require './includes/session.php';
     </div>
   <!-- ./wrapper -->
 
-  <?php include './includes/script.php' ?>
+  <?php include '../../includes/script.php' ?>
 
 </body>
 
