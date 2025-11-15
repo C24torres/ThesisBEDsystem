@@ -12,10 +12,21 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+        <?php
+                        if (!empty($row['img'])) {
+                        ?>
+                        <img style="width: 40px; height: 40px;" src="data:image/jpeg;base64,<?php echo base64_encode($row['img']) ?>" class="img-circle elevation-2 mt-2" alt="User Image">
+                        <?php
+                        } else {
+                        ?>
+                        <img style="width: 40px; height: 40px;" src="../../docs/assets/img/user.png" class="img-circle elevation-2 mt-2" alt="User Image">
+                        <?php
+                        }
+                        ?>
         </div>
         <div class="info">
-          <a href="https://www.facebook.com/charlie.torres.585112" class="d-block">Charlie Torres</a>
+          <a class="d-block"><?php echo $_SESSION['name']; ?></a>
+          <p class="mb-0"><small><?php echo $_SESSION['role']; ?></small></p>
         </div>
       </div>
 
@@ -37,68 +48,111 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item menu-open">
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="./index.php" class="nav-link active">
-                  <p>DASHBOARD</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a href="pages/calendar.html" class="nav-link">
-              <i class="nav-icon far fa-calendar-alt"></i>
+            <a href="../dashboard/index.php" class="nav-link active">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                Calendar
-                <span class="badge badge-info right">2</span>
+                Dashboard
+              </p>
+            </a>
+          </li>
+          <?php
+            if ($_SESSION['role'] == "Super Administrator") { /////////////////////// Super Administrator sidebar
+          ?>
+          <li class="nav-item">
+            <a href="../faculty/faculty.load.php" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Faculty's Load
               </p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="pages/gallery.html" class="nav-link">
-              <i class="nav-icon far fa-image"></i>
+            <a href="../student/list.students.php" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
               <p>
-                Gallery
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="pages/kanban.html" class="nav-link">
-              <i class="nav-icon fas fa-columns"></i>
-              <p>
-                Kanban Board
+                Enrolled Students List
               </p>
             </a>
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link">
-              <i class="nav-icon far fa-envelope"></i>
+              <i class="nav-icon fas fa-file"></i>
               <p>
-                Mailbox
-                <i class="fas fa-angle-left right"></i>
+                Students' Forms
+                <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="pages/mailbox/mailbox.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Inbox</p>
+                <a href="../grade/student.record.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Permanent Record</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="pages/mailbox/compose.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Compose</p>
+                <a href="../grade/student.curriculum.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Curriculum</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="pages/mailbox/read-mail.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Read</p>
+                <a href="../grade/student.summary.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Summary of Grade</p>
                 </a>
               </li>
             </ul>
           </li>
+          <?php
+            } elseif ($_SESSION['role'] == "Registrar")  /////////////////////// Registrar sidebar
+          ?>
+          <li class="nav-item">
+            <a href="../faculty/faculty.load.php" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Faculty's Load
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="../student/list.students.php" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Enrolled Students List
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-file"></i>
+              <p>
+                Students' Forms
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="../grade/student.record.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Permanent Record</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="../grade/student.curriculum.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Curriculum</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="../grade/student.summary.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Summary of Grade</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
