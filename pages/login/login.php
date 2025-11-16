@@ -29,7 +29,8 @@ if (isset($_SESSION['role'])) {
   <!-- Toastr -->
   <link rel="stylesheet" href="../../plugins/toastr/toastr.min.css">
 </head>
-<body src="../../docs/assets/img/college.jpg" class="hold-transition login-page">
+
+<body class="hold-transition login-page ">
 <div class="login-box">
   <!-- /.login-logo -->
   <div class="card card-outline card-danger">
@@ -68,10 +69,10 @@ if (isset($_SESSION['role'])) {
                 </div>
               </div>
               <div class="row">
-                <div class="col-8">
+                <div class="col-md-4">
                 </div>
                 <!-- /.col -->
-                <div class="col-md-4">
+                <div class="col-auto">
                   <button type="submit" name="submit" class="btn btn-danger btn-block">Sign In</button>
                 </div>
                 <!-- /.col -->

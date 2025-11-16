@@ -176,8 +176,8 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                 <tr>
                   <th>Student Number</th>
                   <th>Student</th>
-                  <th>Course</th>
-                  <th>Year Level</th>
+                  <th>Strand</th>
+                  <th>Grade Level</th>
                   <th>View Grade</th>
                   <th>Tuition Status</th>
                   <th>Updated By</th>
@@ -189,51 +189,51 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                 if (isset($_POST['search'])) {
                     $search = addslashes($_POST['search']);
 
-                    $student_info = mysqli_query($conn, "SELECT *, CONCAT(tbl_students.lname, ', ', tbl_students.fname, ' ', tbl_students.mname)  as fullname
+                    $student_info = mysqli_query($conn, "SELECT *, CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname)  as fullname
                     FROM tbl_schoolyears 
                     LEFT JOIN tbl_students ON tbl_students.student_id = tbl_schoolyears.student_id
                     LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
-                    LEFT JOIN tbl_year_levels ON tbl_year_levels.year_id = tbl_schoolyears.year_id
+                    LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
                     WHERE tbl_schoolyears.ay_id = '$acadyear'
-                    AND tbl_schoolyears.sem_id = '$semester'
+                    AND tbl_schoolyears.semester_id = '$semester'
                     AND tbl_schoolyears.remark = 'Approved'
-                    AND (firstname LIKE '%$search%'
-                    OR middlename LIKE '%$search%'
-                    OR lastname LIKE '%$search%'
-                    OR course_abv LIKE '%$search%'
-                    OR course LIKE '%$search%'
-                    OR year_level LIKE '%$search%'
+                    AND (student_fname LIKE '%$search%'
+                    OR student_mname LIKE '%$search%'
+                    OR student_lname LIKE '%$search%'
+                    OR strand_name LIKE '%$search%'
+                    OR strand_def LIKE '%$search%'
+                    OR grade_level LIKE '%$search%'
                     OR year_abv LIKE '%$search%'
                     OR stud_no LIKE '%$search%'
                     OR accounting_status LIKE '%$search%')
-                    ORDER BY lastname");
+                    ORDER BY student_lname");
 
                     while ($row = mysqli_fetch_array($student_info))  {
                 ?>
                 <tr>
                   <td><?php echo $row['stud_no']?></td>
                   <td><?php echo $row['fullname']?></td>
-                  <td><?php echo $row['course_abv']?></td>
-                  <td><?php echo $row['year_level']?></td>
+                  <td><?php echo $row['strand_name']?></td>
+                  <td><?php echo $row['grade_level']?></td>
                   <td><?php echo $row['accounting_status']?></td>
                   <td><?php echo $row['tuition_status']?></td>
                   <td><?php echo $row['updatedby']?> at <br> <?php echo $row['updatedat']?></td>
                   <td>
-                    <button class="btn btn-primary btn-sm m-1" data-toggle="modal" data-target="#modal-md2<?php echo $row['stud_id']; ?>">Set Tuition Status</button>
+                    <button class="btn btn-primary btn-sm m-1" data-toggle="modal" data-target="#modal-md2<?php echo $row['student_id']; ?>">Set Tuition Status</button>
                     <button type="button" class="btn btn-primary btn-sm m-1" data-toggle="dropdown">
                       Forms
                     </button>
                     <ul class="dropdown-menu">
-                      <li class="dropdown-item"><a href="../forms/student.data.curriculum.php?stud_id=<?php echo $row['studednt_id']?>">Curriculum</a></li>
-                      <li class="dropdown-item"><a href="../forms/student.data.curriculum.php?stud_id=<?php echo $row['student_id']?>">Curriculum w/ data</a></li>
+                      <li class="dropdown-item"><a href="../forms/student.data.curriculum.php?student_id=<?php echo $row['student_id']?>">Curriculum</a></li>
+                      <li class="dropdown-item"><a href="../forms/student.data.curriculum.php?student_id=<?php echo $row['student_id']?>">Curriculum w/ data</a></li>
                       <li class="dropdown-divider"></li>
-                      <li class="dropdown-item"><a href="../forms/student.permanent.record.php?stud_id=<?php echo $row['student_id']?>">Permanent Record</a></li>
-                      <li class="dropdown-item"><a href="../grade/summary.grade.php?stud_id=<?php echo $row['stud_id']?>">Summary of Grade</a></li>
+                      <li class="dropdown-item"><a href="../forms/student.permanent.record.php?student_id=<?php echo $row['student_id']?>">Permanent Record</a></li>
+                      <li class="dropdown-item"><a href="../grade/summary.grade.php?student_id=<?php echo $row['student_id']?>">Summary of Grade</a></li>
                     </ul>
                   </td>
                 </tr>
                   <!-- Modal for grade input -->
-                <div class="modal fade" id="modal-md2<?php echo $row['stud_id']; ?>">
+                <div class="modal fade" id="modal-md2<?php echo $row['student_id']; ?>">
                     <div class="modal-dialog modal-md">
                       <div class="modal-content">
                         <div class="modal-header">
@@ -244,7 +244,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                             <span aria-hidden="true">&times;</span>
                           </button>
                         </div>
-                        <form action="userData/ctrl.edit.student.php?stud_id=<?php echo $row['stud_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>"
+                        <form action="userData/ctrl.edit.student.php?student_id=<?php echo $row['student_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>"
                           method="POST">
                           <div class="modal-body">
                             <div class="row justify-content-center">

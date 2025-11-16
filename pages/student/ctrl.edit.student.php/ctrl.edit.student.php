@@ -26,7 +26,7 @@ if (isset($_POST['submit'])) {
     }
 
     $student_info = mysqli_query($conn, "UPDATE tbl_schoolyears SET accounting_status = '$acc_status', tuition_status = '$status', updatedby = '$updated_by'
-    WHERE semester_id = '$semester' AND ay_id = '$acadyear' AND stud_id = '$stud_id'");
+    WHERE semester_id = '$semester' AND ay_id = '$acadyear' AND student_id = '$stud_id'");
     
     $_SESSION['update_success'] = true;
     header("location: ../list.students.php?acadyear=". $acadyear ."&semester=". $semester);
