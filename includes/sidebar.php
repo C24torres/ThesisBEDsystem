@@ -2,9 +2,9 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="https://stfrancis.edu.ph/bedprogram/" class="brand-link">
-      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">ONgrade BED</span>
+    <a href="https://stfrancis.edu.ph/bedprogram/" alt="logo.png" class="brand-link">
+      <img src="../../docs/assets/img/logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">OnGrade BED</span>
     </a>
 
     <!-- Sidebar -->

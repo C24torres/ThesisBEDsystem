@@ -29,7 +29,7 @@ if (isset($_SESSION['role'])) {
   <!-- Toastr -->
   <link rel="stylesheet" href="../../plugins/toastr/toastr.min.css">
 </head>
-<body class="hold-transition login-page">
+<body src="../../docs/assets/img/college.jpg" class="hold-transition login-page">
 <div class="login-box">
   <!-- /.login-logo -->
   <div class="card card-outline card-danger">

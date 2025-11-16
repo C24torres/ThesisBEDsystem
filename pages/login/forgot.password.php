@@ -15,7 +15,7 @@ if (isset($_SESSION['role'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Forgot Password | OnGrade - Bacoor</title>
+    <title>Forgot Password | OnGrade - Laspinas</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"

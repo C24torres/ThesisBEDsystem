@@ -25,21 +25,23 @@ require '../../includes/session.php';
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Dashboard</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
-
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0">Dashboard</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#"></a></li>
+                <li class="breadcrumb-item active"></li>
+              </ol>
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.content-header -->
+       
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
@@ -92,7 +94,7 @@ require '../../includes/session.php';
                     <div class="small-box bg-warning">
                       <div class="inner">
                         <?php
-                        $new_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND status = 'New' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
+                        $new_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND stud_type = 'New' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
                         $total = mysqli_num_rows($new_stud);
                         ?>
                         <h3>
@@ -113,7 +115,7 @@ require '../../includes/session.php';
                     <div class="small-box bg-info">
                       <div class="inner">
                         <?php
-                        $old_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND status = 'Old' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
+                        $old_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND stud_type = 'Old' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
                         $total = mysqli_num_rows($old_stud);
                         ?>
                         <h3>
@@ -130,23 +132,134 @@ require '../../includes/session.php';
                   </div>
                   <!-- ./col -->
                 </div>
+                <?php
+          if ($_SESSION['role'] == "Student1") {
+          ?>
+          <div class="row">
+          <div class="col-md-4">
+                <div class="row">
+                  <div class="col-md-12">
+                    <!-- Widget: user widget style 1 -->
+                    <div class="card card-widget widget-user">
+                      <!-- Add the bg color to the header using any of the bg-* classes -->
+                      <div class="widget-user-header bg-info">
+                        <?php
+                        $student_info = mysqli_query($conn, "SELECT *, CONCAT(student_lname, ', ', student_fname, ' ', student_mname) AS fullname FROM tbl_students
+                        LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id
+                        LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
+                        LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
+                        WHERE semester_id = '$_SESSION[active_semester]'
+                        AND ay_id = '$_SESSION[active_acadyears]'
+                        AND tbl_students.student_id = '$_SESSION[id]'");
+
+                        $row = mysqli_fetch_array($student_info);
+
+                        ?>
+                        <h3 class="widget-user-username">
+                          <?php echo $row['fullname'] ?>
+                        </h3>
+                        <h5 class="widget-user-desc">
+                          <?php echo $row['strand_name'] .' - '. $row['year_abv']?>
+                        </h5>
+                      </div>
+                      <div class="widget-user-image">
+                        <?php
+                        if (!empty($row['img'])) {
+                        ?>
+                        <img class="img-circle elevation-2" style="width: 95px; height: 95px;" src="data:image/jpeg;base64,<?php echo base64_encode($row['img']) ?>" alt="User Avatar">
+                        <?php
+                        } else {
+                        ?>
+                        <img class="img-circle elevation-2" style="width: 95px; height: 95px;" src="../../docs/assets/img/user.png" alt="User Avatar">
+                        <?php
+                        }
+                        ?>
+                      </div>
+                      <div class="card-footer">
+                        <div class="row">
+                          <div class="col-sm-4 border-right">
+                            <div class="description-block">
+                              <?php
+                              $enrolled_subj = mysqli_query($conn, "SELECT * FROM tbl_enrolled_subjects WHERE student_id = '$_SESSION[id]' AND academic_year = '$_SESSION[active_acadyears]' AND semester = '$_SESSION[active_semester]'");
+                              $total = mysqli_num_rows($enrolled_subj);
+                              ?>
+                              <h5 class="description-header">
+                                <?php echo $total; ?>
+                              </h5>
+                              <span class="description-text">Subjects</span>
+                            </div>
+                            <!-- /.description-block -->
+                          </div>
+                          <!-- /.col -->
+                          <div class="col-sm-4 border-right">
+                            <div class="description-block">
+                              <?php
+                              $sum = 0;
+                              $sum1 = 0;
+                              $i = 0;
+                              while ($row = mysqli_fetch_array($enrolled_subj)) {
+                                $sum = $row['ofgrade'] + $sum;
+                                $sum1 = $row['numgrade'] + $sum1;
+                                $i++;
+                              }
+                              $gwa = number_format($sum / $i, 2, '.', '');
+                              $gwa1 = number_format($sum1 / $i, 2, '.', '');
+                              ?>
+                              <h5 class="description-header">
+                                <?php echo $gwa1; ?>
+                              </h5>
+                              <span class="description-text">GWA</span>
+                            </div>
+                            <!-- /.description-block -->
+                          </div>
+                          <!-- /.col -->
+                          <div class="col-sm-4">
+                            <div class="description-block">
+                              <?php
+                              if ($gwa <= 74) {
+                                $remark = "Failed";
+                                $color = "danger";
+
+                              } else {
+                                $remark = "Passed";
+                                $color = "success";
+
+                              }
+
+                              
+                              ?>
+                              <h5 class="description-header text-<?php echo $color ?>"><b>
+                                  <?php echo $remark ?>
+                                </b></h5>
+                              <span class="description-text">Remark</span>
+                            </div>
+                            <!-- /.description-block -->
+                          </div>
+                          <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                      </div>
+                    </div>
+                    <!-- /.widget-user -->
+                  </div>
+                </div>
               </div>
           </div>
+          <?php } ?>
         </div>
-
-      </div><!-- /.container-fluid -->
     </section>
-    <!-- /.content -->
   </div>
+  
 
-      <?php include '../../includes/footer.php'; ?>
+
+  <?php include '../../includes/footer.php'; ?>
 
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
       <!-- Control sidebar content goes here -->
     </aside>
     <!-- /.control-sidebar -->
-    </div>
+  </div>
   <!-- ./wrapper -->
 
   <?php include '../../includes/script.php' ?>
