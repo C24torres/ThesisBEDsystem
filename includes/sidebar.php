@@ -104,7 +104,7 @@
             </ul>
           </li>
           <?php
-            } elseif ($_SESSION['role'] == "Registrar")  /////////////////////// Registrar sidebar
+            } elseif ($_SESSION['role'] == "Registrar")  {/////////////////////// Registrar sidebar
           ?>
           <li class="nav-item">
             <a href="../faculty/faculty.load.php" class="nav-link">
@@ -151,6 +151,106 @@
               </li>
             </ul>
           </li>
+          <?php 
+          } elseif ($_SESSION['role'] == "Adviser") { /////////////////////// Adviser sidebar
+          ?>
+          <?php
+            } elseif ($_SESSION['role'] == "Faculty Staff") { /////////////////////// Faculty Staff sidebar
+          ?>
+          <li class="nav-item">
+            <a href="../faculty/view.load.php" class="nav-link">
+              <i class="nav-icon fas fa-book"></i>
+              <p>
+                Subjects Loads
+              </p>
+            </a>
+          </li>
+          <?php
+            } elseif ($_SESSION['role'] == "Student") { /////////////////////// Student sidebar
+          ?>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-file"></i>
+              <p>
+                Students' Forms
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="../grade/student.record.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Permanent Record</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="../forms/student.data.curriculum.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Curriculum</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="../grade/summary.grade.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Summary of Grade</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <?php
+            } elseif ($_SESSION['role'] == "Enrollment Staff") { /////////////////////// Registrar sidebar
+          ?>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-file"></i>
+              <p>
+                Students' Forms
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="../grade/student.record.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Permanent Record</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="../grade/student.curriculum.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Curriculum</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="../grade/student.summary.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Summary of Grade</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <?php
+            } elseif ($_SESSION['role'] == "Human Resource") { /////////////////////// Registrar sidebar
+          ?>
+          <li class="nav-item">
+            <a href="../faculty/faculty.load.php" class="nav-link">
+              <i class="nav-icon fas fa-users-cog"></i>
+              <p>
+                Faculty Evaluations
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="../evaluation/evaluation.setting.php" class="nav-link">
+              <i class="nav-icon fas fa-cog"></i>
+              <p>
+                Settings
+              </p>
+            </a>
+          </li>
+          <?php
+            }
+          ?>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

@@ -313,12 +313,12 @@ date_default_timezone_set('Asia/Manila');
                                     <option selected disabled>Select section</option>
                                     <?php
                                     $sechedules_info = mysqli_query($conn, "SELECT * FROM tbl_schedules
-                                    LEFT JOIN tbl_subjects_new ON tbl_schedules.subject_id = tbl_subjects_new.subject_id
-                                    LEFT JOIN tbl_faculties_staff ON tbl_schedules.faculty_id = tbl_faculties_staff.faculty_id
-                                    WHERE class_code = '$row[class_code]' AND acad_year = '$acadyear' AND semester = '$semester' AND section NOT IN ('$section')");
+                                    LEFT JOIN tbl_subjects ON tbl_schedules.subject_id = tbl_subjects.subject_id
+                                    LEFT JOIN tbl_teachers ON tbl_schedules.teacher_id = tbl_teachers.teacher_id
+                                    WHERE subject_code = '$row[subject_code]' AND acad_year = '$acadyear' AND semester = '$semester' AND section NOT IN ('$section')");
                                     while ($row1 = mysqli_fetch_array($sechedules_info)) {
                                     ?>
-                                    <option value="<?php echo $row1['schedule_id']?>"><?php echo $row1['class_code'] .' - '. $row1['section'] .' ('. $row1['faculty_lastname'] .')'?></option></option>
+                                    <option value="<?php echo $row1['schedule_id']?>"><?php echo $row1['subject_code'] .' - '. $row1['section'] .' ('. $row1['faculty_lastname'] .')'?></option></option>
                                     <?php
                                     }
                                     ?>

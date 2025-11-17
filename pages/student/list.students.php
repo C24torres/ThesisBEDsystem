@@ -17,7 +17,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Student List | OnGrade - Laspinas</title>
+  <title>Student List | BED OnGrade - Laspinas</title>
 
   <?php include '../../includes/links.php'; ?>
 

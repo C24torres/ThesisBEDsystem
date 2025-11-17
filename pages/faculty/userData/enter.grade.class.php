@@ -1,6 +1,6 @@
 <?php
 include '../../../includes/session.php';
-$class_id = $_GET['class_id'];
+$schedule_id = $_GET['schedule_id'];
 $section = $_GET['section'];
 
 if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
@@ -89,8 +89,8 @@ if (isset($_POST['submit'])) {
 
     $enrolled_subj_array = array();
 
-    if (isset($_POST['enrolled_subj_id'])) {
-        $temp_array = $_POST['enrolled_subj_id'];
+    if (isset($_POST['enrolled_sub_id'])) {
+        $temp_array = $_POST['enrolled_sub_id'];
 
         foreach ($temp_array as $index) {
             if ($index != null) {
@@ -103,7 +103,7 @@ if (isset($_POST['submit'])) {
 
     $i = 0;
 
-    foreach ($enrolled_subj_array as $enrolled_subj_id) {
+    foreach ($enrolled_subj_array as $enrolled_sub_id) {
     $ofgrade = 0;
 
     if (($_SESSION['active_semester'] == "Summer") || ($special_tut_array[$i] == 1)) {
@@ -229,7 +229,7 @@ if (isset($_POST['submit'])) {
         
     }
     
-    $select_es = mysqli_query($conn, "SELECT inc_status FROM tbl_enrolled_subjects WHERE enrolled_subj_id = '$enrolled_subj_id'");
+    $select_es = mysqli_query($conn, "SELECT inc_status FROM tbl_enrolled_subjects WHERE enrolled_sub_id = '$enrolled_sub_id'");
     $row = mysqli_fetch_array($select_es);
     
     if ($row['inc_status'] == 'Yes') {
@@ -243,7 +243,7 @@ if (isset($_POST['submit'])) {
         remarks = '$remarks',
         updated = '$updated_by',
         last_update = '$date'
-        WHERE enrolled_subj_id = '$enrolled_subj_id'");
+        WHERE enrolled_sub_id = '$enrolled_sub_id'");
         
         
     } else {
@@ -258,7 +258,7 @@ if (isset($_POST['submit'])) {
         updated = '$updated_by',
         last_update = '$date',
         inc_status = '$inc_status'
-        WHERE enrolled_subj_id = '$enrolled_subj_id'");
+        WHERE enrolled_sub_id = '$enrolled_sub_id'");
         
         
     }
@@ -270,7 +270,7 @@ if (isset($_POST['submit'])) {
     }
 
     $_SESSION['update_success'] = true;
-    header("location: ../grade.class.php?class_id=" . $class_id . "&section=" . $section . "&acadyear=" . $acadyear . "&semester=" . $semester);
+    header("location: ../grade.class.php?schedule_id=" . $schedule_id . "&section=" . $section . "&acadyear=" . $acadyear . "&semester=" . $semester);
 
     
 

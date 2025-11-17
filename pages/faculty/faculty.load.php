@@ -17,7 +17,7 @@ if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Faculty's Load | OnGrade - Bacoor</title>
+  <title>Faculty's Load | BED OnGrade - Laspinas</title>
 
   <?php include '../../includes/links.php'; ?>
 
@@ -136,14 +136,14 @@ if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
               <tbody>
                 <?php
                 if ($_SESSION['role'] == "Human Resource") {
-                  $faculty_info = mysqli_query($conn, "SELECT tbl_faculties_staff.faculty_id, CONCAT(faculty_lastname, ', ', faculty_firstname) AS fullname FROM tbl_faculties_staff
-                  INNER JOIN tbl_schedules ON tbl_faculties_staff.faculty_id = tbl_schedules.faculty_id
-                  INNER JOIN tbl_enrolled_subjects ON tbl_schedules.class_id = tbl_enrolled_subjects.class_id
+                  $faculty_info = mysqli_query($conn, "SELECT tbl_teachers.teacher_id, CONCAT(teacher_lname, ', ', teacher_fname) AS fullname FROM tbl_teachers 
+                  INNER JOIN tbl_schedules ON tbl_teachers.teacher_id = tbl_schedules.teacher_id
+                  INNER JOIN tbl_enrolled_subjects ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
                   INNER JOIN tbl_evaluations ON tbl_evaluations.enrolled_subj_id = tbl_enrolled_subjects.enrolled_subj_id
                   WHERE tbl_evaluations.sem_id = '$semester' AND tbl_evaluations.ay_id = '$acadyear'
-                  GROUP BY tbl_faculties_staff.faculty_id");
+                  GROUP BY tbl_teachers.teacher_id");
                 } else {
-                  $faculty_info = mysqli_query($conn, "SELECT *, CONCAT(faculty_lastname, ', ', faculty_firstname) AS fullname FROM tbl_faculties_staff");
+                  $faculty_info = mysqli_query($conn, "SELECT *, CONCAT(teacher_lname, ', ', teacher_fname) AS fullname FROM tbl_teachers");
                 }
 
 
@@ -155,12 +155,12 @@ if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
                       <?php
                       if ($_SESSION['role'] == "Human Resource") {
                         ?>
-                        <a href="../forms/faculty.evaluation.form.php?faculty_id=<?php echo $row['faculty_id']; ?>"
+                        <a href="../forms/faculty.evaluation.form.php?teacher_id=<?php echo $row['teacher_id']; ?>"
                           class="btn btn-primary btn-sm">View Faculty Evaluation</a>
                         <?php
                       } else {
                         ?>
-                        <a href="view.load.php?faculty_id=<?php echo $row['faculty_id']; ?>"
+                        <a href="view.load.php?teacher_id=<?php echo $row['teacher_id']; ?>"
                           class="btn btn-primary btn-sm">View Subject Load</a>
                         <?php
                       }
