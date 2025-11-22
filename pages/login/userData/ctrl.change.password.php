@@ -16,13 +16,13 @@ if (isset($_POST['submit'])) {
 
         $activation_code = mysqli_real_escape_string($conn, $_POST['activation_code']);
 
-        $check_username_sa = mysqli_query($conn, "SELECT * FROM tbl_super_admins WHERE username = '$username'") or die(mysqli_error($conn));
+        $check_username_sa = mysqli_query($conn, "SELECT * FROM tbl_master_key WHERE username = '$username'") or die(mysqli_error($conn));
         $count_sa = mysqli_num_rows($check_username_sa);
 
-        $check_username_admins = mysqli_query($conn, "SELECT * FROM tbl_admins WHERE username = '$username'") or die(mysqli_error($conn));
+        $check_username_admins = mysqli_query($conn, "SELECT * FROM tbl_registrars WHERE username = '$username'") or die(mysqli_error($conn));
         $count_admins = mysqli_num_rows($check_username_admins);
 
-        $check_username_faculties_staff = mysqli_query($conn, "SELECT * FROM tbl_faculties_staff WHERE username = '$username'") or die(mysqli_error($conn));
+        $check_username_faculties_staff = mysqli_query($conn, "SELECT * FROM tbl_teachers WHERE username = '$username'") or die(mysqli_error($conn));
         $count_faculties_staff = mysqli_num_rows($check_username_faculties_staff);
 
         $check_username_students = mysqli_query($conn, "SELECT * FROM tbl_students WHERE username = '$username'") or die(mysqli_error($conn));
@@ -30,15 +30,15 @@ if (isset($_POST['submit'])) {
 
         if ($count_sa > 0) {
             $row = mysqli_fetch_array($check_username_sa);
-            $password_update = mysqli_query($conn, "UPDATE tbl_super_admins SET password = '$hashed_password' WHERE username = '$username'");
+            $password_update = mysqli_query($conn, "UPDATE tbl_master_key SET password = '$hashed_password' WHERE username = '$username'");
 
         } elseif ($count_admins > 0) {
             $row = mysqli_fetch_array($check_username_admins);
-            $password_update = mysqli_query($conn, "UPDATE tbl_admins SET password = '$hashed_password' WHERE username = '$username'");
+            $password_update = mysqli_query($conn, "UPDATE tbl_registrars SET password = '$hashed_password' WHERE username = '$username'");
 
         } elseif ($count_faculties_staff > 0) {
             $row = mysqli_fetch_array($check_username_faculties_staff);
-            $password_update = mysqli_query($conn, "UPDATE tbl_faculties_staff SET password = '$hashed_password' WHERE username = '$username'");
+            $password_update = mysqli_query($conn, "UPDATE tbl_teachers SET password = '$hashed_password' WHERE username = '$username'");
 
         } elseif ($count_students > 0) {
             $row = mysqli_fetch_array($check_username_students);

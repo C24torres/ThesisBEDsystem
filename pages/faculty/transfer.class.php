@@ -1,14 +1,14 @@
 <?php
 require '../../includes/session.php';
 
-$class_id = $_GET['class_id'];
+$schedule_id = $_GET['schedule_id'];
 $section = $_GET['section'];
 
 if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
   $acadyear = $_GET['acadyear'];
   $semester = $_GET['semester'];
 } else {
-  $acadyear = $_SESSION['active_acadyear'];
+  $acadyear = $_SESSION['active_acadyears'];
   $semester = $_SESSION['active_semester'];
 }
 ?>
@@ -71,7 +71,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
 
         <!-- Default box -->
         <div class="card">
-          <form action="userData/update.section.class.php?class_id=<?php echo $class_id; ?>&section=<?php echo $section; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>"
+          <form action="userData/update.section.class.php?schedule_id=<?php echo $schedule_id; ?>&section=<?php echo $section; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>"
             method="POST">
             <div class="card-header">
               <h3 class="card-title"><b>
@@ -104,15 +104,15 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                                   <select class="form-control select2" name="new_class_id">
                                     <option selected disabled>Select section</option>
                                     <?php
-                                    $current_sched = mysqli_query($conn, "SELECT * FROM tbl_schedules WHERE class_id = '$class_id' AND section = '$section'");
+                                    $current_sched = mysqli_query($conn, "SELECT * FROM tbl_schedules WHERE schedule_id = '$schedule_id' AND section = '$section'");
                                     $row = mysqli_fetch_array($current_sched);
                                     $sechedules_info = mysqli_query($conn, "SELECT * FROM tbl_schedules
-                                    LEFT JOIN tbl_subjects_new ON tbl_schedules.subj_id = tbl_subjects_new.subj_id
-                                    LEFT JOIN tbl_faculties_staff ON tbl_schedules.faculty_id = tbl_faculties_staff.faculty_id
+                                    LEFT JOIN tbl_subjects_senior ON tbl_schedules.subject_id = tbl_subjects_senior.subject_id
+                                    LEFT JOIN tbl_teachers ON tbl_schedules.teacher_id = tbl_teachers.teacher_id
                                     WHERE class_code = '$row[class_code]' AND acad_year = '$acadyear' AND semester = '$semester' AND section NOT IN ('$section')");
                                     while ($row1 = mysqli_fetch_array($sechedules_info)) {
                                     ?>
-                                    <option value="<?php echo $row1['class_id']?>"><?php echo $row1['class_code'] .' - '. $row1['section'] .' ('. $row1['faculty_lastname'] .')'?></option></option>
+                                    <option value="<?php echo $row1['schedule_id']?>"><?php echo $row1['class_code'] .' - '. $row1['section'] .' ('. $row1['teacher_lname'] .')'?></option></option>
                                     <?php
                                     }
                                     ?>
@@ -150,19 +150,19 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                 </thead>
                 <tbody>
                   <?php
-                  $load_info = mysqli_query($conn, "SELECT *, CONCAT(tbl_students.lastname, ', ', tbl_students.firstname, ' ', tbl_students.middlename)  as fullname, tbl_enrolled_subjects.last_update
+                  $load_info = mysqli_query($conn, "SELECT *, CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname)  as fullname, tbl_enrolled_subjects.last_update
                 FROM tbl_enrolled_subjects 
-                LEFT JOIN tbl_subjects_new ON tbl_subjects_new.subj_id = tbl_enrolled_subjects.subj_id
-                LEFT JOIN tbl_students ON tbl_students.stud_id = tbl_enrolled_subjects.stud_id
-                LEFT JOIN tbl_schoolyears ON tbl_schoolyears.stud_id = tbl_students.stud_id
-                LEFT JOIN tbl_schedules ON tbl_schedules.class_id = tbl_enrolled_subjects.class_id
-                LEFT JOIN tbl_courses ON tbl_courses.course_id = tbl_schoolyears.course_id
-                WHERE tbl_schedules.class_id = '$class_id'
+                LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_enrolled_subjects.subject_id
+                LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
+                LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id
+                LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
+                WHERE tbl_schedules.schedule_id = '$schedule_id'
                 AND tbl_schedules.section = '$section' 
                 AND tbl_schoolyears.ay_id = '$acadyear'
-                AND tbl_schoolyears.sem_id = '$semester'
+                AND tbl_schoolyears.semester_id = '$semester'
                 AND tbl_schoolyears.remark = 'Approved'
-                ORDER BY lastname ASC");
+                ORDER BY student_lname ASC");
 
                   while ($row = mysqli_fetch_array($load_info)) {
                     $last_updated = new DateTime($row['last_update']);
@@ -170,7 +170,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                     <tr>
                       <td>
                         <div class="form-check">
-                          <input type="checkbox" class="form-check-input select-all" id="exampleCheck1" value="<?php echo $row['enrolled_subj_id']?>" name="enrolled_subj_id[]">
+                          <input type="checkbox" class="form-check-input select-all" id="exampleCheck1" value="<?php echo $row['enrolled_subject_id']?>" name="enrolled_subject_id[]">
                         </div>
                       </td>
                       <td>
@@ -192,7 +192,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                         <?php echo strtoupper($row['fullname']); ?>
                       </td>
                       <td>
-                        <?php echo $row['course_abv']; ?>
+                        <?php echo $row['strand_name']; ?>
                       </td>
                       <td>
                         <?php echo $last_updated->format('h:i a \o\n M d, Y') ?>

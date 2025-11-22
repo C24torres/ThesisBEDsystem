@@ -78,7 +78,7 @@ date_default_timezone_set('Asia/Manila');
                   <th>Image</th>
                   <th>Student ID</th>
                   <th>Student Name</th>
-                  <th>Course</th>
+                  <th>Strand</th>
                   <th>Prelims</th>
                   <th>Midterms</th>
                   <th>Finalterms</th>
@@ -101,15 +101,17 @@ date_default_timezone_set('Asia/Manila');
                 LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id
                 LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
                 LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
+                LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
                 WHERE tbl_schedules.schedule_id = '$schedule_id'
-                AND tbl_schoolyears.section = '$section' 
-                AND tbl_schoolyears.ay_id = '$acadyear'
-                AND tbl_schoolyears.semester_id = '$semester'
+                AND tbl_schedules.section = '$section' 
+                AND tbl_acadyears.academic_year = '$acadyear'
+                AND tbl_semesters.semester = '$semester'
                 AND tbl_schoolyears.remark = 'Approved'
-                ORDER BY lastname ASC");
+                ORDER BY student_lname ASC");
 
                 while ($row = mysqli_fetch_array($load_info)) {
-                    $last_updated = new DateTime($row['last_update']);
+                    // $last_updated = 0;
                   ?>
                   <tr>
                     <td>
@@ -176,7 +178,7 @@ date_default_timezone_set('Asia/Manila');
                       <?php echo $row['inc_status']; ?>
                     </td>
                     <td>
-                      <?php echo $last_updated->format('h:i a \o\n M d, Y') ?>
+                      <?php //echo $last_updated->format('h:i a \o\n M d, Y') ?>
                     </td>
                     <td>
                       <?php echo $row['updated']; ?>
@@ -315,10 +317,10 @@ date_default_timezone_set('Asia/Manila');
                                     $sechedules_info = mysqli_query($conn, "SELECT * FROM tbl_schedules
                                     LEFT JOIN tbl_subjects ON tbl_schedules.subject_id = tbl_subjects.subject_id
                                     LEFT JOIN tbl_teachers ON tbl_schedules.teacher_id = tbl_teachers.teacher_id
-                                    WHERE subject_code = '$row[subject_code]' AND acad_year = '$acadyear' AND semester = '$semester' AND section NOT IN ('$section')");
+                                    WHERE class_code = '$row[class_code]' AND acadyear = '$acadyear' AND semester = '$semester' AND section NOT IN ('$section')");
                                     while ($row1 = mysqli_fetch_array($sechedules_info)) {
                                     ?>
-                                    <option value="<?php echo $row1['schedule_id']?>"><?php echo $row1['subject_code'] .' - '. $row1['section'] .' ('. $row1['faculty_lastname'] .')'?></option></option>
+                                    <option value="<?php echo $row1['schedule_id']?>"><?php echo $row1['class_code'] .' - '. $row1['section'] .' ('. $row1['teacher_lname'] .')'?></option></option>
                                     <?php
                                     }
                                     ?>

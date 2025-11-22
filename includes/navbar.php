@@ -17,6 +17,30 @@
 
     </ul>
 
+    <!-- Right navbar links -->
+    <?php
+    if ($_SESSION['role'] == "Super Administrator") {
+        $sa_info = mysqli_query($conn, "SELECT *, name AS fullname FROM tbl_master_key WHERE mk_id = '$_SESSION[id]'");
+        $row = mysqli_fetch_array($sa_info);
+
+    } elseif ($_SESSION['role'] == "Registrar") {
+        $admin_info = mysqli_query($conn, "SELECT *, CONCAT(reg_lname, ', ', reg_fname) AS fullname FROM tbl_registrars WHERE reg_id = '$_SESSION[id]'");
+        $row = mysqli_fetch_array($admin_info);
+
+    } elseif ($_SESSION['role'] == "Faculty Staff") {
+        $faculty_staff_info = mysqli_query($conn, "SELECT *, CONCAT(teacher_lname, ', ', teacher_fname) AS fullname FROM tbl_teachers WHERE teacher_id = '$_SESSION[id]'");
+        $row = mysqli_fetch_array($faculty_staff_info);
+
+    } elseif ($_SESSION['role'] == "Student") {
+        $student_info = mysqli_query($conn, "SELECT *, CONCAT(student_lname, ', ', student_fname) AS fullname FROM tbl_students WHERE student_id = '$_SESSION[id]'");
+        $row = mysqli_fetch_array($student_info);
+
+    } else {
+        
+    }
+
+    ?>
+<!-- 
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
@@ -58,7 +82,7 @@
                 <a href="../login/userData/ctrl.logout.php" class="dropdown-item dropdown-footer"><b>Log Out</b></a>
             </div>
         </li>
-    </ul>
+    </ul> -->
     <!-- Right navbar links
     <ul class="navbar-nav ml-auto">
            Navbar Search

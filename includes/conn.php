@@ -8,9 +8,9 @@
     $server = 'localhost';
     $username = 'root';
     $password = '';
-    $db = 'bed_enrollmentdb';
+    $db = 'BED_enrollment';
 
-    $conn = new mysqli($server, $username, $password, $db);
+    $conn = new mysqli($server, $username, $password, $db, 3307);
 
 
     

@@ -127,6 +127,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                                         <?php
                                     }
                                     ?>
+                                    
                                   </select>
                                 </div>
                               </div>
@@ -194,8 +195,10 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                     LEFT JOIN tbl_students ON tbl_students.student_id = tbl_schoolyears.student_id
                     LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
                     LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
-                    WHERE tbl_schoolyears.ay_id = '$acadyear'
-                    AND tbl_schoolyears.semester_id = '$semester'
+                    LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                    LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
+                    AND tbl_acadyears.academic_year = '$acadyear'
+                    AND tbl_semesters.semester = '$semester'
                     AND tbl_schoolyears.remark = 'Approved'
                     AND (student_fname LIKE '%$search%'
                     OR student_mname LIKE '%$search%'

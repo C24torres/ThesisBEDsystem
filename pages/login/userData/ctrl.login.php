@@ -21,17 +21,36 @@ if (isset($_POST['submit']) || isset($_SESSION['update_success'])) {
         $password = mysqli_real_escape_string($conn, $_POST['password']);
     }
 
-    $registrar = mysqli_query($conn, "SELECT * FROM tbl_registrars WHERE username = '$username'");
-    $numrow_registrar = mysqli_num_rows($registrar);
+    $super_admin = mysqli_query($conn, "SELECT * FROM tbl_master_key WHERE username = '$username'");
+    $numrow_sa = mysqli_num_rows($super_admin);
 
-    $teacher = mysqli_query($conn, "SELECT * FROM tbl_teachers WHERE username = '$username'");
-    $numrow_teacher = mysqli_num_rows($teacher);
+    $admin = mysqli_query($conn, "SELECT * FROM tbl_registrars WHERE username = '$username'");
+    $numrow_admin = mysqli_num_rows($admin);
+
+    $faculty_staff = mysqli_query($conn, "SELECT * FROM tbl_teachers WHERE username = '$username'");
+    $numrow_faculty_staff = mysqli_num_rows($faculty_staff);
 
     $student = mysqli_query($conn, "SELECT * FROM tbl_students WHERE username = '$username'");
     $numrow_student = mysqli_num_rows($student);
+    
 
-    if ($numrow_registrar > 0) {
-        $row = mysqli_fetch_array($registrar);
+    if ($numrow_sa > 0) {
+        $row = mysqli_fetch_array($super_admin);
+        $hashedpass = password_verify($password, $row['password']);
+
+        if ($hashedpass == true) {
+            $_SESSION['role'] = "Super Administrator";
+            $_SESSION['id'] = $row['mk_id'];
+            $_SESSION['name'] = $row['name'];
+
+            header("location: ../../dashboard/index.php");
+
+        } else {
+            $_SESSION['password_incorrect'] = true;
+            header("location: ../login.php");
+        }
+    } elseif ($numrow_admin > 0) {
+        $row = mysqli_fetch_array($admin);
         $hashedpass = password_verify($password, $row['password']);
 
         if ($hashedpass == true) {
@@ -46,14 +65,30 @@ if (isset($_POST['submit']) || isset($_SESSION['update_success'])) {
             header("location: ../login.php");
         }
 
-    } elseif ($numrow_teacher > 0) {
+    }  elseif ($numrow_faculty > 0) {
         $row = mysqli_fetch_array($faculty);
         $hashedpass = password_verify($password, $row['password']);
 
         if ($hashedpass == true) {
             $_SESSION['role'] = "Adviser";
+            $_SESSION['id'] = $row['ad_id'];
+            $_SESSION['name'] = $row['ad_lname'] . ", " . $row['ad_lname'];
+
+            header("location: ../../dashboard/index.php");
+
+        } else {
+            $_SESSION['password_incorrect'] = true;
+            header("location: ../login.php");
+        }
+
+    } elseif ($numrow_faculty_staff > 0) {
+        $row = mysqli_fetch_array($faculty_staff);
+        $hashedpass = password_verify($password, $row['password']);
+
+        if ($hashedpass == true) {
+            $_SESSION['role'] = "Faculty Staff";
             $_SESSION['id'] = $row['teacher_id'];
-            $_SESSION['name'] = $row['teacher_lname'] . ", " . $row['teacher_name'];
+            $_SESSION['name'] = $row['teacher_lname'] . ", " . $row['teacher_fname'];
 
             header("location: ../../dashboard/index.php");
 
@@ -89,7 +124,7 @@ if (isset($_POST['submit']) || isset($_SESSION['update_success'])) {
             header("location: ../login.php");
         }
 
-    }  else {
+    } else {
         $_SESSION['username_incorrect'] = true;
         header("location: ../login.php");
     }

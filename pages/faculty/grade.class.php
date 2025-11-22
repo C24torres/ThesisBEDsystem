@@ -8,7 +8,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
   $acadyear = $_GET['acadyear'];
   $semester = $_GET['semester'];
 } else {
-  $acadyear = $_SESSION['active_acadyear'];
+  $acadyear = $_SESSION['active_acadyears'];
   $semester = $_SESSION['active_semester'];
 }
 ?>
@@ -90,25 +90,27 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                 </thead>
                 <tbody>
                   <?php
-                  $load_info = mysqli_query($conn, "SELECT *, CONCAT(tbl_students.lastname, ', ', tbl_students.firstname, ' ', tbl_students.middlename)  as fullname, tbl_enrolled_subjects.last_update
+                  $load_info = mysqli_query($conn, "SELECT *, CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname)  as fullname, tbl_enrolled_subjects.last_update
                 FROM tbl_enrolled_subjects 
-                LEFT JOIN tbl_subjects_new ON tbl_subjects_new.subj_id = tbl_enrolled_subjects.subj_id
-                LEFT JOIN tbl_students ON tbl_students.stud_id = tbl_enrolled_subjects.stud_id
-                LEFT JOIN tbl_schoolyears ON tbl_schoolyears.stud_id = tbl_students.stud_id
+                LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_enrolled_subjects.subject_id
+                LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
+                LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id
                 LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
-                LEFT JOIN tbl_courses ON tbl_courses.course_id = tbl_schoolyears.course_id
+                LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
+                LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
                 WHERE tbl_schedules.schedule_id = '$schedule_id'
                 AND tbl_schedules.section = '$section' 
-                AND tbl_schoolyears.ay_id = '$acadyear'
-                AND tbl_schoolyears.sem_id = '$semester'
+                AND tbl_acadyears.academic_year = '$acadyear'
+                AND tbl_semesters.semester = '$semester'
                 AND tbl_schoolyears.remark = 'Approved'
-                ORDER BY lastname ASC");
+                ORDER BY student_lname ASC");
 
                   while ($row = mysqli_fetch_array($load_info)) {
                     $last_updated = new DateTime($row['last_update']);
                     ?>
                     <tr>
-                      <input type="text" name="enrolled_subj_id[]" value="<?php echo $row['enrolled_subj_id']; ?>" hidden>
+                      <input type="text" name="enrolled_sub_id[]" value="<?php echo $row['enrolled_sub_id']; ?>" hidden>
                       <input type="text" name="special_tut[]" value="<?php echo $row['special_tut']; ?>" hidden>
                       <td>
                         <?php
@@ -129,7 +131,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                         <?php echo strtoupper($row['fullname']); ?>
                       </td>
                       <td>
-                        <?php echo $row['course_abv']; ?>
+                        <?php echo $row['strand_name']; ?>
                       </td>
                       <td>
                         <?php

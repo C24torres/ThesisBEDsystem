@@ -77,10 +77,11 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
               </thead>
               <tbody>
                 <?php
-                $load_info = mysqli_query($conn, "SELECT * FROM tbl_schedules LEFT JOIN tbl_subjects_new ON tbl_subjects_new.subj_id = tbl_schedules.subj_id
+                $load_info = mysqli_query($conn, "SELECT * FROM tbl_schedules 
+                LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
                 WHERE teacher_id = '$teacher_id'
                 AND subject_code = '$subject_code'
-                AND academic_year = '$acadyear'
+                AND acadyear = '$acadyear'
                 AND semester = '$semester'");
 
                 while ($row = mysqli_fetch_array($load_info))  {
@@ -94,9 +95,9 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                     <?php
                     if ($_SESSION['role'] == "Registrar" || $_SESSION['role'] == "Faculty Staff") {
                     ?>
-                      <a href="class.php?class_id=<?php echo $row['class_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View Class</a>
-                      <a href="../forms/rog.php?subject_code=<?php echo $row['subject_code']?>&class_id=<?php echo $row['class_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View ROG</a>
-                      <a href="../forms/class.list.php?subject_code=<?php echo $row['subject_code']?>&class_id=<?php echo $row['class_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View Class List</a>
+                      <a href="class.php?schedule_id=<?php echo $row['schedule_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View Class</a>
+                      <a href="../forms/rog.php?subject_code=<?php echo $row['subject_code']?>&schedule_id=<?php echo $row['schedule_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View ROG</a>
+                      <a href="../forms/class.list.php?subject_code=<?php echo $row['subject_code']?>&schedule_id=<?php echo $row['schedule_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View Class List</a>
                     <?php
                     } else {
                     ?>

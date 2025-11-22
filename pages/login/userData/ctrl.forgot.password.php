@@ -13,16 +13,16 @@ require '../../PHPMailer/src/SMTP.php';
 if (isset($_POST['submit']) && !empty($_POST['email'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
 
-    $check_email_sa = mysqli_query($conn, "SELECT *, name AS fullname FROM tbl_super_admins WHERE email = '$email'") or die(mysqli_error($conn));
+    $check_email_sa = mysqli_query($conn, "SELECT *, name AS fullname FROM tbl_master_key WHERE email = '$email'") or die(mysqli_error($conn));
     $count_sa = mysqli_num_rows($check_email_sa);
 
-    $check_email_admins = mysqli_query($conn, "SELECT *, CONCAT(admin_firstname, ', ', admin_lastname) AS fullname FROM tbl_admins WHERE email = '$email'") or die(mysqli_error($conn));
+    $check_email_admins = mysqli_query($conn, "SELECT *, CONCAT(reg_fname, ', ', reg_lname) AS fullname FROM tbl_registrars WHERE email = '$email'") or die(mysqli_error($conn));
     $count_admins = mysqli_num_rows($check_email_admins);
 
-    $check_email_faculties_staff = mysqli_query($conn, "SELECT *, CONCAT(faculty_firstname, ', ', faculty_lastname) AS fullname FROM tbl_faculties_staff WHERE email = '$email'") or die(mysqli_error($conn));
+    $check_email_faculties_staff = mysqli_query($conn, "SELECT *, CONCAT(teacher_fname, ', ', teacher_lname) AS fullname FROM tbl_teachers WHERE email = '$email'") or die(mysqli_error($conn));
     $count_faculties_staff = mysqli_num_rows($check_email_faculties_staff);
 
-    $check_email_students = mysqli_query($conn, "SELECT *, CONCAT(firstname, ', ', lastname) AS fullname FROM tbl_students WHERE email = '$email'") or die(mysqli_error($conn));
+    $check_email_students = mysqli_query($conn, "SELECT *, CONCAT(student_fname, ', ', student_lname) AS fullname FROM tbl_students WHERE email = '$email'") or die(mysqli_error($conn));
     $count_students = mysqli_num_rows($check_email_students);
 
     if ($count_sa > 0 || $count_admins > 0 || $count_faculties_staff > 0 || $count_students > 0) {
@@ -31,19 +31,19 @@ if (isset($_POST['submit']) && !empty($_POST['email'])) {
         
         if ($count_sa > 0) {
             $row = mysqli_fetch_array($check_email_sa);
-            $add_code = mysqli_query($conn, "UPDATE tbl_super_admins SET activation_code = '$activation_code' WHERE sa_id = '$row[sa_id]'");
+            $add_code = mysqli_query($conn, "UPDATE tbl_master_key SET activation_code = '$activation_code' WHERE mk_id = '$row[mk_id]'");
 
         } elseif ($count_admins > 0) {
             $row = mysqli_fetch_array($check_email_admins);
-            $add_code = mysqli_query($conn, "UPDATE tbl_admins SET activation_code = '$activation_code' WHERE admin_id = '$row[admin_id]'");
+            $add_code = mysqli_query($conn, "UPDATE tbl_registrars SET activation_code = '$activation_code' WHERE reg_id = '$row[reg_id]'");
 
         } elseif ($count_faculties_staff > 0) {
             $row = mysqli_fetch_array($check_email_faculties_staff);
-            $add_code = mysqli_query($conn, "UPDATE tbl_faculties_staff SET activation_code = '$activation_code' WHERE faculty_id = '$row[faculty_id]'");
+            $add_code = mysqli_query($conn, "UPDATE tbl_teachers SET activation_code = '$activation_code' WHERE teacher_id = '$row[teacher_id]'");
 
         } elseif ($count_students > 0) {
             $row = mysqli_fetch_array($check_email_students);
-            $add_code = mysqli_query($conn, "UPDATE tbl_students SET activation_code = '$activation_code' WHERE stud_id = '$row[stud_id]'");
+            $add_code = mysqli_query($conn, "UPDATE tbl_students SET activation_code = '$activation_code' WHERE student_id = '$row[student_id]'");
 
         }
 

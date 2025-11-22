@@ -10,7 +10,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
   $acadyear = $_GET['acadyear'];
   $semester = $_GET['semester'];
 } else {
-  $acadyear = $_SESSION['active_acadyear'];
+  $acadyear = $_SESSION['active_acadyears'];
   $semester = $_SESSION['active_semester'];
 }
 
@@ -73,7 +73,7 @@ if (isset($_POST['submit'])) {
                 $remarks = "Passed";
         
             } else {
-        
+                $remarks = "INC";
             }
 
         } elseif (($midterm == 0) || ($finalterm == 0)) {

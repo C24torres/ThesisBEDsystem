@@ -13,7 +13,7 @@ if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
   $acadyear = $_POST['acadyear'];
   $semester = $_POST['semester'];
 } else {
-  $acadyear = $_SESSION['active_acadyear'];
+  $acadyear = $_SESSION['active_acadyears'];
   $semester = $_SESSION['active_semester'];
 }
 ?>
@@ -136,7 +136,7 @@ if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
                 $load_info = mysqli_query($conn, "SELECT * FROM tbl_schedules
                 LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
                 WHERE teacher_id = '$teacher_id' AND acadyear = '$acadyear' AND semester = '$semester'
-                GROUP BY tbl_subjects.subject_code");
+                GROUP BY tbl_subjects_senior.subject_code");
 
                 while ($row = mysqli_fetch_array($load_info))  {
                 ?>
