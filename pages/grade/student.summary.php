@@ -59,14 +59,14 @@ require '../../includes/session.php';
                                             <div class="col-sm-12">
                                                 <div class="form-group">
                                                     <label>Student</label>
-                                                    <select class="form-control select2" name="stud_id"
+                                                    <select class="form-control select2" name="student_id"
                                                         style="width: 100%;">
                                                         <option selected disabled>Select Student</option>
                                                         <?php
-                                                        $stud_info = mysqli_query($conn, "SELECT stud_id, CONCAT(lastname, ', ', firstname, ' ', middlename) as fullname FROM tbl_students ORDER BY lastname ASC");
+                                                        $stud_info = mysqli_query($conn, "SELECT student_id, CONCAT(student_lname, ', ', student_fname, ' ', student_mname) as fullname FROM tbl_students ORDER BY student_lname ASC");
                                                         while ($row = mysqli_fetch_array($stud_info)) {
                                                             ?>
-                                                            <option value="<?php echo $row['stud_id'] ?>"><?php echo $row['fullname'] ?>
+                                                            <option value="<?php echo $row['student_id'] ?>"><?php echo $row['fullname'] ?>
                                                             </option>
                                                         <?php } ?>
                                                     </select>
@@ -83,9 +83,9 @@ require '../../includes/session.php';
                                 </form>
                                 <?php
                                 if (isset($_POST['submit'])) {
-                                    $stud_id = $_POST['stud_id'];
+                                    $student_id = $_POST['student_id'];
 
-                                    header("location: summary.grade.php?stud_id=".$stud_id);
+                                    header("location: summary.grade.php?student_id=".$student_id);
                                 }
                                 ?>
                                 <!-- /.card-footer-->

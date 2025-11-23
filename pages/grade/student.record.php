@@ -5,14 +5,14 @@ if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
     $acadyear = $_POST['acadyear'];
     $semester = $_POST['semester'];
   } else {
-    $acadyear = $_SESSION['active_acadyear'];
+    $acadyear = $_SESSION['active_acadyears'];
     $semester = $_SESSION['active_semester'];
   }
 
 if ($_SESSION['role'] == "Student") {
-    $stud_id = $_SESSION['id'];
-} elseif (isset($_POST['stud_id'])) {
-    $stud_id = $_POST['stud_id'];
+    $student_id = $_SESSION['id'];
+} elseif (isset($_POST['student_id'])) {
+    $student_id = $_POST['student_id'];
 } else {
 
 }
@@ -80,21 +80,21 @@ if ($_SESSION['role'] == "Student") {
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label>Student</label>
-                                        <select class="form-control select2" name="stud_id" style="width: 100%;" <?php echo ($_SESSION['role'] == "Student") ? 'disabled' : ''; ?>>
+                                        <select class="form-control select2" name="student_id" style="width: 100%;" <?php echo ($_SESSION['role'] == "Student") ? 'disabled' : ''; ?>>
                                             <option selected disabled>Select Student</option>
                                             <?php
                                             if ($_SESSION['role'] == "Student") {
-                                            $stud_info = mysqli_query($conn, "SELECT stud_id, CONCAT(lastname, ', ', firstname, ' ', middlename) as fullname FROM tbl_students WHERE stud_id = '$stud_id' ORDER BY lastname ASC");
+                                            $stud_info = mysqli_query($conn, "SELECT student_id, CONCAT(student_lname, ', ', student_fname, ' ', student_mname) as fullname FROM tbl_students WHERE student_id = '$student_id' ORDER BY student_lname ASC");
                                             while ($row = mysqli_fetch_array($stud_info)) {
                                             ?>
-                                                <option selected value="<?php echo $row['stud_id'] ?>"><?php echo $row['fullname'] ?>
+                                                <option selected value="<?php echo $row['student_id'] ?>"><?php echo $row['fullname'] ?>
                                                 </option>
                                             <?php
                                             } } else {
-                                            $stud_info = mysqli_query($conn, "SELECT stud_id, CONCAT(lastname, ', ', firstname, ' ', middlename) as fullname FROM tbl_students ORDER BY lastname ASC");
+                                            $stud_info = mysqli_query($conn, "SELECT student_id, CONCAT(student_lname, ', ', student_fname, ' ', student_mname) as fullname FROM tbl_students ORDER BY student_lname ASC");
                                             while ($row = mysqli_fetch_array($stud_info)) {
                                             ?>
-                                                <option value="<?php echo $row['stud_id'] ?>"><?php echo $row['fullname'] ?>
+                                                <option value="<?php echo $row['student_id'] ?>"><?php echo $row['fullname'] ?>
                                                 </option>
                                             <?php } }?>
                                         </select>
@@ -150,9 +150,9 @@ if ($_SESSION['role'] == "Student") {
                 </div>
                 <!-- /.card -->
                 <?php
-                    if (isset($stud_id)) {
-                    $stud_info = mysqli_query($conn, "SELECT *, CONCAT(lastname, ', ', firstname, ' ', middlename) as fullname FROM tbl_students 
-                    LEFT JOIN tbl_schoolyears ON tbl_schoolyears.stud_id = tbl_students.stud_id WHERE tbl_schoolyears.stud_id = '$stud_id' AND ay_id = '$acadyear' AND sem_id = '$semester'");
+                    if (isset($student_id)) {
+                    $stud_info = mysqli_query($conn, "SELECT *, CONCAT(student_lname, ', ', student_fname, ' ', student_mname) as fullname FROM tbl_students 
+                    LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id WHERE tbl_schoolyears.student_id = '$student_id' AND ay_id = '$acadyear' AND semester_id = '$semester'");
                     if (mysqli_num_rows($stud_info) != 0) {
                     $row = mysqli_fetch_array($stud_info);
 
@@ -166,12 +166,12 @@ if ($_SESSION['role'] == "Student") {
                                 <?php
                                 if ($_SESSION['role'] == "Registrar" || $_SESSION['role'] == "Student" && $row['accounting_status'] != "Disabled") {
                                 ?>
-                                <a class="btn btn-primary btn-sm" href="../forms/student.gwa.php?stud_id=<?php echo $row['stud_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>">Check GWA</a>
+                                <a class="btn btn-primary btn-sm" href="../forms/student.gwa.php?student_id=<?php echo $row['student_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>">Check GWA</a>
                                 <?php
                                 }
                                 if ($_SESSION['role'] == "Super Administrator" || $_SESSION['role'] == "Registrar" || $_SESSION['role'] == "Enrollment Staff") {
                                 ?>
-                                <a class="btn btn-primary btn-sm" href="../forms/student.permanent.record.php?stud_id=<?php echo $row['stud_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>">Permanent Record</a>
+                                <a class="btn btn-primary btn-sm" href="../forms/student.permanent.record.php?student_id=<?php echo $row['student_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>">Permanent Record</a>
                                 <?php
                                 }
                                 ?>
@@ -194,11 +194,11 @@ if ($_SESSION['role'] == "Student") {
                                 <tbody>
                                     <?php
                                     $stud_info = mysqli_query($conn, "SELECT * FROM tbl_enrolled_subjects
-                                    LEFT JOIN tbl_subjects_new ON tbl_subjects_new.subj_id = tbl_enrolled_subjects.subj_id
-                                    WHERE stud_id = '$stud_id' AND acad_year = '$acadyear' AND semester = '$semester'");
+                                    LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_enrolled_subjects.subject_id
+                                    WHERE student_id = '$student_id' AND academic_year = '$acadyear' AND semester = '$semester'");
                                     while ($row2 = mysqli_fetch_array($stud_info)) {
-                                        $faculty_info = mysqli_query($conn, "SELECT *, CONCAT(faculty_lastname, ', ', faculty_firstname, ' ', faculty_middlename) AS faculty_name FROM tbl_faculties_staff
-                                        LEFT JOIN tbl_schedules ON tbl_schedules.faculty_id = tbl_faculties_staff.faculty_id WHERE class_id = '$row2[class_id]'");
+                                        $faculty_info = mysqli_query($conn, "SELECT *, CONCAT(teacher_lname, ', ', teacher_fname, ' ', teacher_mname) AS teacher_name FROM tbl_teachers
+                                        LEFT JOIN tbl_schedules ON tbl_schedules.teacher_id = tbl_teachers.teacher_id WHERE schedule_id = '$row2[schedule_id]'");
 
                                         $row3 = mysqli_fetch_array($faculty_info);
 
@@ -213,10 +213,10 @@ if ($_SESSION['role'] == "Student") {
                                         ?>
                                         <tr>
                                             <td>
-                                                <?php echo $row2['subj_code']; ?>
+                                                <?php echo $row2['subject_code']; ?>
                                             </td>
                                             <td>
-                                                <?php echo $row2['subj_desc']; ?><br>Instructor: <?php echo $row3['faculty_name']; ?>
+                                                <?php echo $row2['subject_description']; ?><br>Instructor: <?php echo $row3['teacher_name']; ?>
                                             </td>
                                             <td>
                                                 <?php echo $row2['prelim']; ?>

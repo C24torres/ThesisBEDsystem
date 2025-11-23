@@ -52,7 +52,10 @@ require '../../includes/session.php';
             <div class="small-box bg-success">
               <div class="inner">
                 <?php
-                $total_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
+                $total_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears 
+                LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
+                WHERE remark = 'Approved' AND tbl_acadyears.academic_year = '$_SESSION[active_acadyears]' AND tbl_semesters.semester = '$_SESSION[active_semester]'");
                 $total = mysqli_num_rows($total_stud);
                 ?>
                 <h3>
@@ -73,7 +76,10 @@ require '../../includes/session.php';
                     <div class="small-box bg-danger">
                       <div class="inner">
                         <?php
-                        $pending_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Pending' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
+                        $pending_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears
+                        LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                        LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
+                        WHERE remark = 'Pending' AND tbl_acadyears.academic_year = '$_SESSION[active_acadyears]' AND tbl_semesters.semester = '$_SESSION[active_semester]'");
                         $total = mysqli_num_rows($pending_stud);
                         ?>
                         <h3>
@@ -94,7 +100,10 @@ require '../../includes/session.php';
                     <div class="small-box bg-warning">
                       <div class="inner">
                         <?php
-                        $new_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND stud_type = 'New' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
+                        $new_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears 
+                        LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                        LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
+                        WHERE remark = 'Approved' AND stud_type = 'New' AND tbl_acadyears.academic_year = '$_SESSION[active_acadyears]' AND tbl_semesters.semester = '$_SESSION[active_semester]'");
                         $total = mysqli_num_rows($new_stud);
                         ?>
                         <h3>
@@ -115,7 +124,10 @@ require '../../includes/session.php';
                     <div class="small-box bg-info">
                       <div class="inner">
                         <?php
-                        $old_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears WHERE remark = 'Approved' AND stud_type = 'Old' AND ay_id = '$_SESSION[active_acadyears]' AND semester_id = '$_SESSION[active_semester]'");
+                        $old_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears 
+                        LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                        LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
+                        WHERE remark = 'Approved' AND stud_type = 'Old' AND tbl_acadyears.academic_year = '$_SESSION[active_acadyears]' AND tbl_semesters.semester = '$_SESSION[active_semester]'");
                         $total = mysqli_num_rows($old_stud);
                         ?>
                         <h3>

@@ -81,8 +81,8 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
                 <?php
                 $sy_info = mysqli_query($conn, "SELECT *, tbl_schoolyears.ay_id FROM tbl_schoolyears
                 LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
-                LEFT JOIN tbl_semesters ON tbl_schoolyears.semester_id = tbl_semesters.semester
-                LEFT JOIN tbl_acadyears ON tbl_schoolyears.ay_id = tbl_acadyears.academic_year
+                LEFT JOIN tbl_semesters ON tbl_schoolyears.semester_id = tbl_semesters.semester_id
+                LEFT JOIN tbl_acadyears ON tbl_schoolyears.ay_id = tbl_acadyears.ay_id
                 LEFT JOIN tbl_grade_levels ON tbl_schoolyears.grade_level_id = tbl_grade_levels.grade_level_id 
                 WHERE student_id = '$student_id' AND remark = 'Approved'
                 ORDER BY tbl_grade_levels.grade_level_id ASC, tbl_semesters.semester_id ASC");

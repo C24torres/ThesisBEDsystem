@@ -558,10 +558,10 @@ while ($row = mysqli_fetch_array($que)) {
         $fontsize1 = 10;
         $tempFontSize2 = $fontsize1;
         $cellwidth1 = 22;
-        while ($pdf->GetStringWidth($row['strand_name'] . '-' . $row['year_abv']) > $cellwidth1) {
+        while ($pdf->GetStringWidth($row['strand_name'] . '-' . $row['department_id']) > $cellwidth1) {
             $pdf->SetFontSize($tempFontSize2 -= 0.1);
         }
-        $pdf->Cell(23.4, 5, $row['strand_name'] . '-' . $row['year_abv'], 1, 0);
+        $pdf->Cell(23.4, 5, $row['strand_name'] . '-' . $row['department_id'], 1, 0);
         $pdf->SetFont('Arial', '', '9');
         $pdf->Cell(10.5, 5, $row['prelim'], 1, 0, 'C');
         $pdf->Cell(9.5, 5, $row['midterm'], 1, 0, 'C');
