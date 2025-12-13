@@ -99,7 +99,7 @@ $pdf ->AddPage();
    
    $pdf->Cell(90,4,'Effective Academic Year '.$eay['efacadyear'],0,1,'C');
     
-    // eto dati
+    // eto dati 
     // $pdf->Cell(90,4,'(Effective Academic Year 2018-2019)',0,1,'C');
      // Line break
     $pdf->Ln(1);

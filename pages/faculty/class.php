@@ -94,7 +94,8 @@ date_default_timezone_set('Asia/Manila');
               </thead>
               <tbody>
                 <?php
-                $load_info = mysqli_query($conn, "SELECT *, CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname)  as fullname, tbl_enrolled_subjects.last_update
+                $load_info = mysqli_query($conn, "SELECT img, stud_no, strand_name, prelim, midterm, finalterm, ofgrade, numgrade, remarks, absences, inc_status, updated, enrolled_sub_id, special_tut, class_code,
+                CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname)  as fullname, tbl_enrolled_subjects.last_update
                 FROM tbl_enrolled_subjects 
                 LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_enrolled_subjects.subject_id
                 LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id

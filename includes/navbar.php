@@ -1,8 +1,8 @@
 
   <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
+  <!-- <div class="preloader flex-column justify-content-center align-items-center">
     <img class="animation__shake" src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
+  </div> -->
 
   <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -40,7 +40,7 @@
     }
 
     ?>
-<!-- 
+
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
@@ -82,7 +82,7 @@
                 <a href="../login/userData/ctrl.logout.php" class="dropdown-item dropdown-footer"><b>Log Out</b></a>
             </div>
         </li>
-    </ul> -->
+    </ul> 
     <!-- Right navbar links
     <ul class="navbar-nav ml-auto">
            Navbar Search
@@ -108,4 +108,4 @@
       </li>
     </ul> -->
   </nav>
-  <!-- /.navbar -->
+  <!-- /.navbar

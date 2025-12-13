@@ -62,12 +62,34 @@ require '../../includes/session.php';
                   <?php echo $total; ?>
                 </h3>
 
-                <p>Enrolled Students</p>
+                <p>Enrolled SHS Students </p>
               </div>
               <div class="icon">
                 <i class="ion ion-bag"></i>
               </div>
                 <a href="<?php echo $_SESSION['role']== "Registrar" ? "../student/list.students.php" : "#"?>" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <?php
+                $total_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears 
+                LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
+                WHERE remark = 'Approved' AND tbl_acadyears.academic_year = '$_SESSION[active_acadyears]' 
+                AND tbl_grade_levels.grade_level_id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13) ");
+                $total = mysqli_num_rows($total_stud);
+                ?>
+                <h3>
+                  <?php echo $total; ?>
+                </h3>
+
+                <p>Enrolled Elementary Students</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-bag"></i>
+              </div>
+                <a href="<?php echo $_SESSION['role']== "Registrar" ? "../student/list.elem.php" : "#"?>" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -93,8 +115,31 @@ require '../../includes/session.php';
                       </div>
                       <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
+                    <!-- small box -->
+                    <div class="small-box bg-danger">
+                      <div class="inner">
+                        <?php
+                        $pending_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears
+                        LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                        JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
+                        WHERE remark = 'Pending' AND tbl_acadyears.academic_year = '$_SESSION[active_acadyears]'
+                        AND  tbl_grade_levels.grade_level_id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13) ");
+                        $total = mysqli_num_rows($pending_stud);
+                        ?>
+                        <h3>
+                          <?php echo $total; ?>
+                        </h3>
+
+                        <p>Pending Elementary Students</p>
+                      </div>
+                      <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
+                      </div>
+                      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
                   </div>
                   <!-- ./col -->
+                   
                   <div class="col-lg-3 col-6">
                     <!-- small box -->
                     <div class="small-box bg-warning">
@@ -114,6 +159,28 @@ require '../../includes/session.php';
                       </div>
                       <div class="icon">
                         <i class="ion ion-person-add"></i>
+                      </div>
+                      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                    <!-- small box -->
+                    <div class="small-box bg-warning">
+                      <div class="inner">
+                        <?php
+                        $pending_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears
+                        LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                        JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
+                        WHERE remark = 'Approved' AND stud_type = 'New' AND tbl_acadyears.academic_year = '$_SESSION[active_acadyears]'
+                        AND  tbl_grade_levels.grade_level_id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13) ");
+                        $total = mysqli_num_rows($pending_stud);
+                        ?>
+                        <h3>
+                          <?php echo $total; ?>
+                        </h3>
+
+                        <p>New Elementary Students</p>
+                      </div>
+                      <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
                       </div>
                       <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
@@ -138,6 +205,28 @@ require '../../includes/session.php';
                       </div>
                       <div class="icon">
                         <i class="ion ion-pie-graph"></i>
+                      </div>
+                      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                    <!-- small box -->
+                    <div class="small-box bg-info">
+                      <div class="inner">
+                        <?php
+                        $pending_stud = mysqli_query($conn, "SELECT * FROM tbl_schoolyears
+                        LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                        JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
+                        WHERE remark = 'Approved' AND stud_type = 'Old' AND tbl_acadyears.academic_year = '$_SESSION[active_acadyears]'
+                        AND  tbl_grade_levels.grade_level_id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13) ");
+                        $total = mysqli_num_rows($pending_stud);
+                        ?>
+                        <h3>
+                          <?php echo $total; ?>
+                        </h3>
+
+                        <p>Old Elementary Students</p>
+                      </div>
+                      <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
                       </div>
                       <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>

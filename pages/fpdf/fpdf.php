@@ -8,6 +8,10 @@
 *******************************************************************************/
 
 define('FPDF_VERSION','1.82');
+ob_clean();
+
+$pdf = new FPDF();
+
 
 class FPDF
 {
@@ -1207,12 +1211,28 @@ protected function _UTF8toUTF16($s)
 
 protected function _escape($s)
 {
-	// Escape special characters
-	if(strpos($s,'(')!==false || strpos($s,')')!==false || strpos($s,'\\')!==false || strpos($s,"\r")!==false)
-		return str_replace(array('\\','(',')',"\r"), array('\\\\','\\(','\\)','\\r'), $s);
-	else
-		return $s;
+    // Prevent deprecated warning by forcing NULL to string
+    if ($s === null) {
+        return '';
+    }
+
+    // Escape special characters
+    if (
+        strpos($s, '(') !== false ||
+        strpos($s, ')') !== false ||
+        strpos($s, '\\') !== false ||
+        strpos($s, "\r") !== false
+    ) {
+        return str_replace(
+            array('\\','(',')',"\r"),
+            array('\\\\','\\(','\\)','\\r'),
+            $s
+        );
+    }
+
+    return $s;
 }
+
 
 protected function _textstring($s)
 {
@@ -1890,6 +1910,10 @@ protected function _enddoc()
 	$this->_put($offset);
 	$this->_put('%%EOF');
 	$this->state = 3;
+
+	
+
 }
 }
-?>
+$pdf->Output();
+exit;

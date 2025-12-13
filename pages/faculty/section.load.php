@@ -96,8 +96,6 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                     if ($_SESSION['role'] == "Registrar" || $_SESSION['role'] == "Faculty Staff") {
                     ?>
                       <a href="class.php?schedule_id=<?php echo $row['schedule_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View Class</a>
-                      <a href="../forms/rog.php?subject_code=<?php echo $row['subject_code']?>&schedule_id=<?php echo $row['schedule_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View ROG</a>
-                      <a href="../forms/class.list.php?subject_code=<?php echo $row['subject_code']?>&schedule_id=<?php echo $row['schedule_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View Class List</a>
                     <?php
                     } else {
                     ?>

@@ -101,8 +101,14 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
                 <?php
                     $enrolled_subjects = mysqli_query($conn, "SELECT * FROM tbl_enrolled_subjects
                     LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
-                    LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_enrolled_subjects.subject_id
-                    WHERE tbl_enrolled_subjects.student_id = '$student_id' AND tbl_subjects_senior.strand_id = '$row[strand_id]' AND acad_year = '$row[ay_id]' AND semester = '$row[semester]'");
+                    LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                    LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
+                    WHERE tbl_enrolled_subjects.student_id = '$student_id' 
+                    AND tbl_subjects_senior.strand_id = '$row[strand_id]' 
+                    AND tbl_schedules.acadyear = '$row[academic_year]' 
+                    AND tbl_subjects_senior.subject_code = 'subject_code'
+                    AND tbl_subjects_senior.subject_description = 'subject_description'
+                    AND tbl_schedules.semester = '$row[semester]'");
 
                     while ($row2 = mysqli_fetch_array($enrolled_subjects)) {
 

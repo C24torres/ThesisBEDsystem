@@ -1,12 +1,12 @@
 <?php
 require '../../includes/session.php';
 
-if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
+if (isset($_GET['acadyear'])) {
     $acadyear = $_GET['acadyear'];
-    $semester = $_GET['semester'];
+    
 } else {
     $acadyear = $_SESSION['active_acadyears'];
-    $semester = $_SESSION['active_semester'];
+    
 }
 
 ?>
@@ -37,7 +37,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Student List <b><?php echo $semester .' - '. $acadyear?></b></h1>
+              <h1 class="m-0">Student List <b><?php echo $acadyear?></b></h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
@@ -56,9 +56,9 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
         <!-- Default box -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Student List for <b><?php echo $semester .' - '. $acadyear?></b></h3>
+            <h3 class="card-title">Student List for <b><?php echo $acadyear?></b></h3>
             <div class="card-tools">
-                <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-md1">Set Sem and AY</button>
+                <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-md1">Set AcadYear</button>
                 <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-md2">Set Tuition Status</button>
             </div>
             
@@ -74,7 +74,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                             <span aria-hidden="true">&times;</span>
                           </button>
                         </div>
-                        <form action="userData/ctrl.edit.student.php?acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>"
+                        <form action="userData/ctrl.edit.elem.php?acadyear=<?php echo $acadyear?>"
                           method="POST">
                           <div class="modal-body">
                             <div class="row justify-content-center">
@@ -115,22 +115,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                           method="GET">
                           <div class="modal-body">
                             <div class="row justify-content-center">
-                              <div class="col-sm-12">
-                                <div class="form-group">
-                                  <label>Semester</label>
-                                  <select class="form-control select2" name="semester">
-                                    <?php
-                                    $select_sem = mysqli_query($conn, 'SELECT * FROM tbl_semesters');
-                                    while ($row = mysqli_fetch_array($select_sem)) {
-                                        ?>
-                                        <option value='<?php echo $row['semester']?>'><?php echo $row['semester']?></option>
-                                        <?php
-                                    }
-                                    ?>
-                                    
-                                  </select>
-                                </div>
-                              </div>
+                              
                               <div class="col-sm-12">
                                 <div class="form-group">
                                   <label>Academic Year</label>
@@ -177,7 +162,6 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                 <tr>
                   <th>Student Number</th>
                   <th>Student</th>
-                  <th>Strand</th>
                   <th>Grade Level</th>
                   <th>View Grade</th>
                   <th>Tuition Status</th>
@@ -197,17 +181,14 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                     LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
                     LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
                     LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
-                    LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
+                    
                     WHERE tbl_acadyears.academic_year = '$acadyear'
-                    AND tbl_semesters.semester = '$semester'
+                    AND tbl_grade_levels.grade_level_id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
                     AND tbl_schoolyears.remark = 'Approved'
-                    AND tbl_grade_levels.grade_level_id IN (14, 15)
                     AND (student_fname LIKE '%$search%'
                     OR student_mname LIKE '%$search%'
                     OR student_lname LIKE '%$search%'
-                    OR strand_name LIKE '%$search%'
-                    OR strand_def LIKE '%$search%'
-                    OR grade_level LIKE '%$search%'
+                    OR grade_level  LIKE '%$search%'
                     OR stud_no LIKE '%$search%'
                     OR accounting_status LIKE '%$search%')
                     ORDER BY student_lname");
@@ -217,7 +198,6 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                 <tr>
                   <td><?php echo $row['stud_no']?></td>
                   <td><?php echo $row['fullname']?></td>
-                  <td><?php echo $row['strand_name']?></td>
                   <td><?php echo $row['grade_level']?></td>
                   <td><?php echo $row['accounting_status']?></td>
                   <td><?php echo $row['tuition_status']?></td>
@@ -246,7 +226,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                             <span aria-hidden="true">&times;</span>
                           </button>
                         </div>
-                        <form action="userData/ctrl.edit.student.php?student_id=<?php echo $row['student_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>"
+                        <form action="userData/ctrl.edit.elem.php?student_id=<?php echo $row['student_id']?>&acadyear=<?php echo $acadyear?>"
                           method="POST">
                           <div class="modal-body">
                             <div class="row justify-content-center">

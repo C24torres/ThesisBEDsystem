@@ -14,11 +14,11 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
     $acadyear = $_GET['acadyear'];
     $semester = $_GET['semester'];
 } else {
-    $acadyear = $_SESSION['active_acadyear'];
+    $acadyear = $_SESSION['active_acadyears'];
     $semester = $_SESSION['active_semester'];
 }
 
-$query = mysqli_query($conn, "SELECT *,CONCAT(tbl_students.lastname, ' ', tbl_students.firstname, ' ', tbl_students.middlename)  as fullname FROM tbl_schoolyears
+$query = mysqli_query($conn, "SELECT *,CONCAT(tbl_students.student_lname, ' ', tbl_students.student_fname, ' ', tbl_students.student_mname)  as fullname FROM tbl_schoolyears
     LEFT JOIN tbl_students ON tbl_students.student_id = tbl_schoolyears.student_id
     LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
     where tbl_schoolyears.student_id = '$student_id' AND tbl_schoolyears.ay_id = '$acadyear' AND tbl_schoolyears.semester_id = '$semester'");
@@ -65,17 +65,17 @@ $pdf->Cell(3, 5, ':', 0, 0);
 $pdf->Cell(36, 5, '', 'B', 1);
 $pdf->Cell(25, 5, 'Date of Birth', 0, 0, 'L');
 $pdf->Cell(3, 5, ':', 0, 0);
-$pdf->Cell(74, 5, $row['birthdate'], 'B', 0);
+$pdf->Cell(74, 5, $row['date_birth'], 'B', 0);
 
 $pdf->Cell(34, 5, '  Place of Birth', 0, 0, 'L');
 $pdf->Cell(3, 5, ':', 0, 0);
 $fontsize = 10;
 $tempFontSize = $fontsize;
 $cellwidth = 35;
-while ($pdf->GetStringWidth($row['birthplace']) > $cellwidth) {
+while ($pdf->GetStringWidth($row['place_birth']) > $cellwidth) {
     $pdf->SetFontSize($tempFontSize -= 0.1);
 }
-$pdf->Cell(36, 5, $row['birthplace'], 'B', 1);
+$pdf->Cell(36, 5, $row['place_birth'], 'B', 1);
 $pdf->SetFont('Arial', '', 10);
 $pdf->Cell(25, 5, 'Home Address', 0, 0, 'L');
 $pdf->Cell(3, 5, ':', 0, 0);
@@ -102,10 +102,10 @@ $pdf->Cell(70, 5, 'Elementary Grade Completed (School)', 0, 0, 'L');
 $fontsize = 10;
 $tempFontSize = $fontsize;
 $cellwidth = 69;
-while ($pdf->GetStringWidth($row['elem']) > $cellwidth) {
+while ($pdf->GetStringWidth($row['prev_grade_level']) > $cellwidth) {
     $pdf->SetFontSize($tempFontSize -= 0.1);
 }
-$pdf->Cell(70, 5, $row['elem'], 'B', 0);
+$pdf->Cell(70, 5, $row['prev_grade_level'], 'B', 0);
 $pdf->SetFont('Arial', '', 10);
 $pdf->Cell(3, 5, '', 0, 0);
 $pdf->Cell(14, 5, 'Year   :', 0, 0);

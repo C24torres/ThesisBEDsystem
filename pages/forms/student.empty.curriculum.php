@@ -74,7 +74,7 @@ $pdf ->AddPage();
     // dummy cell
     $pdf->Cell(50);
     // //cell(width,height,text,border,end line,[align])
-    $pdf->Cell(90,4,strtoupper($row['course']),0,1,'C');
+    $pdf->Cell(90,4,strtoupper($row['strand_name']),0,1,'C');
 
     // Line break
 
