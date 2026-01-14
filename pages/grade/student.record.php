@@ -11,7 +11,7 @@ if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
 
 if ($_SESSION['role'] == "Student") {
     $student_id = $_SESSION['id'];
-} elseif (isset($_POST['student_id'])) {
+} elseif (isset($_POST['submit']) && !empty($_POST['student_id'])) {
     $student_id = $_POST['student_id'];
 } else {
 
@@ -151,9 +151,12 @@ if ($_SESSION['role'] == "Student") {
                 <!-- /.card -->
                 <?php
                     if (isset($student_id)) {
+
+                        echo 1;
                     $stud_info = mysqli_query($conn, "SELECT *, CONCAT(student_lname, ', ', student_fname, ' ', student_mname) as fullname FROM tbl_students 
-                    LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id WHERE tbl_schoolyears.student_id = '$student_id' AND ay_id = '$acadyear' AND semester_id = '$semester'");
+                    LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id WHERE tbl_schoolyears.student_id = '$student_id' AND tbl_schoolyears.ay_id = '$acadyear' AND tbl_schoolyears.semester_id = '$semester'");
                     if (mysqli_num_rows($stud_info) != 0) {
+                        echo 2;
                     $row = mysqli_fetch_array($stud_info);
 
                     ?>
@@ -183,7 +186,6 @@ if ($_SESSION['role'] == "Student") {
                                     <tr>
                                         <th>Subject Code</th>
                                         <th>Subject Description</th>
-                                        <th>Prelim</th>
                                         <th>Midterm</th>
                                         <th>Finalterm</th>
                                         <th>Final Grade</th>
@@ -218,9 +220,7 @@ if ($_SESSION['role'] == "Student") {
                                             <td>
                                                 <?php echo $row2['subject_description']; ?><br>Instructor: <?php echo $row3['teacher_name']; ?>
                                             </td>
-                                            <td>
-                                                <?php echo $row2['prelim']; ?>
-                                            </td>
+                                            
                                             <td>
                                                 <?php echo $row2['midterm']; ?>
                                             </td>

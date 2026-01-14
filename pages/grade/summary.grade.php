@@ -70,7 +70,6 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
                 <tr>
                   <th>Subject Code</th>
                   <th>Subject Description</th>
-                  <th>Prelim</th>
                   <th>Midterm</th>
                   <th>Finalterm</th>
                   <th>Numerical Grade</th>
@@ -96,19 +95,31 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td></td>
+                  
                 </tr>
                 <?php
+                    if ($row['grade_level_id'] <= 13) {
+                    // NURSERY TO GRADE 10
                     $enrolled_subjects = mysqli_query($conn, "SELECT * FROM tbl_enrolled_subjects
-                    LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
-                    LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
-                    LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
-                    WHERE tbl_enrolled_subjects.student_id = '$student_id' 
-                    AND tbl_subjects_senior.strand_id = '$row[strand_id]' 
-                    AND tbl_schedules.acadyear = '$row[academic_year]' 
-                    AND tbl_subjects_senior.subject_code = 'subject_code'
-                    AND tbl_subjects_senior.subject_description = 'subject_description'
-                    AND tbl_schedules.semester = '$row[semester]'");
+                        LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
+                        LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                        LEFT JOIN tbl_subjects ON tbl_subjects.subject_id = tbl_schedules.subject_id
+                        WHERE tbl_enrolled_subjects.student_id = '$student_id'
+                        AND tbl_schedules.acadyear = '$row[academic_year]'
+                    ");
+                } else {
+                    // SENIOR HIGH SCHOOL
+                    $enrolled_subjects = mysqli_query($conn, "SELECT * FROM tbl_enrolled_subjects
+                        LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
+                        LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                        LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
+                        WHERE tbl_enrolled_subjects.student_id = '$student_id'
+                        AND tbl_subjects_senior.strand_id = '$row[strand_id]'
+                        AND tbl_schedules.acadyear = '$row[academic_year]'
+                        AND tbl_schedules.semester = '$row[semester]'
+                    ");
+                }
+
 
                     while ($row2 = mysqli_fetch_array($enrolled_subjects)) {
 
@@ -120,7 +131,7 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
                 
                 <tr>
                   <td><?php echo $row2['subject_code']?></td>
-                  <td><?php echo $row2['subject_description']?><br>Instructor: <?php echo $row3['teacher_name']?></td>
+                  <td><?php echo $row2['subject_description']?><br>Instructor: <?php echo !empty($row3['teacher_name']) ? $row3['teacher_name'] : 'TBA'; ?></td>
                   
                   <?php
                   if ($_SESSION['role'] == "Student" && $row['accounting_status'] == "Disabled") {
@@ -129,7 +140,6 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
                   <?php
                   } else {
                   ?>
-                  <td><?php echo $row2['prelim']?></td>
                   <td><?php echo $row2['midterm']?></td>
                   <td><?php echo $row2['finalterm']?></td>
                   <td><?php echo $row2['numgrade']?></td>

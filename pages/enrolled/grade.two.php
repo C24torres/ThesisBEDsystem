@@ -10,30 +10,31 @@ if (isset($_GET['acadyear'])) {
 }
 
 function mf_low($grade) {
-    if ($grade <= 75) return 1;
-    if ($grade >= 85) return 0;
-    return (85 - $grade) / 10;  // linear decrease
+    if ($grade <= 60) return 1;     // fully low
+    if ($grade >= 75) return 0;     // end of low
+    return (75 - $grade) / 15;      // linear decrease 60->75
 }
 
 function mf_average($grade) {
-    if ($grade <= 75 || $grade >= 95) return 0;
-    if ($grade == 85) return 1;
-    if ($grade < 85) return ($grade - 75) / 10;  // increase to 1
-    return (95 - $grade) / 10;  // decrease from 1
+    if ($grade <= 60 || $grade >= 95) return 0; // no average below 60 or above 95
+    if ($grade == 82.5) return 1;               // peak average in middle
+    if ($grade < 82.5) return ($grade - 60) / 22.5;   // increase to peak
+    return (95 - $grade) / 12.5;               // decrease from peak to 0 at 95
 }
 
 function mf_high($grade) {
-    if ($grade <= 85) return 0;
-    if ($grade >= 95) return 1;
-    return ($grade - 85) / 10;  // linear increase
+    if ($grade <= 85) return 0;     // no high below 85
+    if ($grade >= 100) return 1;    // fully high at 100
+    return ($grade - 85) / 15;      // linear increase 85->100
 }
+
 
 // -------------------------------
 // Defuzzification via Centroid
 // -------------------------------
 function defuzzify($low, $avg, $high) {
     // weighted centroid formula
-    $numerator = ($low * 60) + ($avg * 85) + ($high * 95);
+    $numerator = ($low * 60) + ($avg * 82.5) + ($high * 100);
     $denominator = ($low + $avg + $high);
 
     if ($denominator == 0) return 0;
@@ -52,6 +53,18 @@ function fuzzy_rank_student($grade) {
 
     // defuzzification
     return defuzzify($low, $avg, $high);
+}
+
+function get_distinction($average) {
+    if ($average >= 98 && $average <= 100) {
+        return "With Highest Honors";
+    } elseif ($average >= 95 && $average <= 97.99) {
+        return "With High Honors";
+    } elseif ($average >= 90 && $average <= 94.99) {
+        return "With Honors";
+    } else {
+        return "—";
+    }
 }
 
 ?>
@@ -105,12 +118,7 @@ function fuzzy_rank_student($grade) {
             <h3 class="card-title">Student List for <b><?php echo $acadyear?></b></h3>
             <div class="card-tools">
                 <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-md1">Set AcadYear</button>
-                
             </div>
-            
-                  
-                  
-                  
                   <div class="modal fade" id="modal-md1">
                     <div class="modal-dialog modal-md">
                       <div class="modal-content">
@@ -173,11 +181,10 @@ function fuzzy_rank_student($grade) {
                 <tr>
                   <th>Student Number</th>
                   <th>Student</th>
-                  
                   <th>Grade Level</th>
                   <th>Fuzzy Scores</th>
                   <th>Rank</th>
-                  
+                  <th>Distinction</th>
 
                 </tr>
               </thead>
@@ -192,19 +199,16 @@ function fuzzy_rank_student($grade) {
                     $student_info = mysqli_query($conn, "SELECT stud_no, grade_level, tbl_students.student_id, 
                     CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname)  as fullname
                     FROM tbl_schoolyears
-                    iNNER JOIN tbl_students ON tbl_students.student_id = tbl_schoolyears.student_id
-                    
+                    INNER JOIN tbl_students ON tbl_students.student_id = tbl_schoolyears.student_id
                     LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
                     LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
                     LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
                     WHERE tbl_acadyears.academic_year = '$acadyear'
-                    
                     AND tbl_schoolyears.remark = 'Approved'
                     AND tbl_grade_levels.grade_level_id = 5
                     AND (student_fname LIKE '%$search%'
                     OR student_mname LIKE '%$search%'
                     OR student_lname LIKE '%$search%'
-
                     OR grade_level LIKE '%$search%'
                     OR stud_no LIKE '%$search%')
                     ORDER BY student_lname");
@@ -229,12 +233,13 @@ function fuzzy_rank_student($grade) {
 
                         // PUSH into array
                         $students[] = [
-                            "stud_no" => $row['stud_no'],
-                            "fullname" => $row['fullname'],
-                            
-                            "grade_level" => $row['grade_level'],
-                            "fuzzy_score" => $total_ave   // <- this is the score you will rank
-                        ];
+                        "stud_no" => $row['stud_no'],
+                        "fullname" => $row['fullname'],
+                        "grade_level" => $row['grade_level'],
+                        "average" => $total_ave,
+                        "fuzzy_score" => fuzzy_rank_student($total_ave),
+                        "distinction" => get_distinction($total_ave)
+                    ];
                     }
 
                          usort($students, function($a, $b) {
@@ -252,10 +257,11 @@ function fuzzy_rank_student($grade) {
                         <tr>
                             <td>{$s['stud_no']}</td>
                             <td>{$s['fullname']}</td>
-                            
                             <td>{$s['grade_level']}</td>
                             <td>" . number_format((float)$s['fuzzy_score'], 2,  '.', '') . "</td>
                             <td>{$s['rank']}</td>
+                            <td><b>{$s['distinction']}</b></td>
+
                         </tr>";
                     }
                 }

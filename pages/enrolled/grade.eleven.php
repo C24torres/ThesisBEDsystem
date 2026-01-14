@@ -10,49 +10,63 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
 }
 
 function mf_low($grade) {
-    if ($grade <= 75) return 1;
-    if ($grade >= 85) return 0;
-    return (85 - $grade) / 10;  // linear decrease
+    if ($grade <= 60) return 1;
+    if ($grade >= 75) return 0;
+    return (75 - $grade) / 15;   // linear decrease 60->75
 }
 
+// Average membership
 function mf_average($grade) {
-    if ($grade <= 75 || $grade >= 95) return 0;
-    if ($grade == 85) return 1;
-    if ($grade < 85) return ($grade - 75) / 10;  // increase to 1
-    return (95 - $grade) / 10;  // decrease from 1
+    if ($grade <= 60 || $grade >= 95) return 0;
+    if ($grade == 77.5) return 1; // peak average
+    if ($grade < 77.5) return ($grade - 60) / 17.5;
+    return (95 - $grade) / 17.5;
 }
 
+// High membership
 function mf_high($grade) {
     if ($grade <= 85) return 0;
-    if ($grade >= 95) return 1;
-    return ($grade - 85) / 10;  // linear increase
+    if ($grade >= 100) return 1;
+    return ($grade - 85) / 15;
 }
 
-// -------------------------------
-// Defuzzification via Centroid
-// -------------------------------
-function defuzzify($low, $avg, $high) {
-    // weighted centroid formula
-    $numerator = ($low * 60) + ($avg * 85) + ($high * 95);
-    $denominator = ($low + $avg + $high);
+// Defuzzification
+function defuzzify($low, $avg, $high, $grade) {
+    // Weighted centroid
+    $numerator = ($low * 60) + ($avg * 77.5) + ($high * 100);
+    $denominator = $low + $avg + $high;
 
-    if ($denominator == 0) return 0;
+    if ($denominator == 0) return $grade; // fallback: raw grade
 
-    return $numerator / $denominator;
+    $fuzzy = $numerator / $denominator;
+
+    // Clamp fuzzy score to raw grade maximum
+    if ($fuzzy > $grade) $fuzzy = $grade;
+
+    return $fuzzy;
 }
 
-// -------------------------------
-// Fuzzy Ranking Function
-// -------------------------------
+// Fuzzy ranking function
 function fuzzy_rank_student($grade) {
-    // fuzzification
     $low = mf_low($grade);
     $avg = mf_average($grade);
     $high = mf_high($grade);
 
-    // defuzzification
-    return defuzzify($low, $avg, $high);
+    return defuzzify($low, $avg, $high, $grade);
 }
+
+function get_distinction($average) {
+    if ($average >= 98 && $average <= 100) {
+        return "With Highest Honors";
+    } elseif ($average >= 95 && $average <= 97.99) {
+        return "With High Honors";
+    } elseif ($average >= 90 && $average <= 94.99) {
+        return "With Honors";
+    } else {
+        return "—";
+    }
+}
+
 
 ?>
 
@@ -227,7 +241,7 @@ function fuzzy_rank_student($grade) {
                   <th>Grade Level</th>
                   <th>Fuzzy Scores</th>
                   <th>Rank</th>
-                  
+                  <th>Distinction</th>
 
                 </tr>
               </thead>
@@ -270,33 +284,101 @@ function fuzzy_rank_student($grade) {
                             AND tbl_subjects_senior.semester_id = '$_SESSION[active_semester_id]'
                             AND tbl_schedules.acadyear = '$_SESSION[active_acadyears]'");
 
-                        $average = 0;
-                        $index = 0;
-                        while($row1 = mysqli_fetch_array($grade_info))  {
-                            $average += $row1['ofgrade'];
-                            $index++;
+                    // -------------------------------
+                    // FIRST SEMESTER AVERAGE
+                    // -------------------------------
+                    $first_total = 0;
+                    $first_count = 0;
+
+                    $first_sem = mysqli_query($conn, "SELECT ofgrade FROM tbl_enrolled_subjects
+                        LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                        WHERE student_id = '{$row['student_id']}'
+                        AND tbl_schedules.semester = 'First Semester'
+                        AND tbl_schedules.acadyear = '$acadyear'
+                    ");
+
+                    while ($fs = mysqli_fetch_array($first_sem)) {
+                        if ($fs['ofgrade'] !== null && is_numeric($fs['ofgrade'])) {
+                            $first_total += (float)$fs['ofgrade'];
+                            $first_count++;
                         }
-                        $total_ave = ($index > 0) ? $average / $index : 0;
+                    }
+
+
+                    $first_avg = ($first_count > 0) ? $first_total / $first_count : 0;
+
+
+                    // -------------------------------
+                    // SECOND SEMESTER AVERAGE
+                    // -------------------------------
+                    $second_total = 0;
+                    $second_count = 0;
+
+                    $second_sem = mysqli_query($conn, "SELECT ofgrade FROM tbl_enrolled_subjects
+                        LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                        WHERE student_id = '{$row['student_id']}'
+                        AND tbl_schedules.semester = 'Second Semester'
+                        AND tbl_schedules.acadyear = '$acadyear'
+                    ");
+
+                    while ($ss = mysqli_fetch_array($second_sem)) {
+                        if ($ss['ofgrade'] !== null && is_numeric($ss['ofgrade'])) {
+                            $second_total += (float)$ss['ofgrade'];
+                            $second_count++;
+                        }
+                    }
+
+
+                    $second_avg = ($second_count > 0) ? $second_total / $second_count : 0;
+
+
+                    // -------------------------------
+                    // FINAL AVERAGE (CONDITION)
+                    // -------------------------------
+                    if ($second_count > 0) {
+                        // ONLY compute combined average if second sem exists
+                        $total_ave = ($first_avg + $second_avg) / 2;
+                    } else {
+                        // Otherwise, show first semester only
+                        $total_ave = $first_avg;
+                    }
+
+                        $total_ave = (float)$total_ave;
+
+                        $distinction = get_distinction($total_ave);
 
                         // PUSH into array
                         $students[] = [
-                            "stud_no" => $row['stud_no'],
-                            "fullname" => $row['fullname'],
-                            "strand_name" => $row['strand_name'],
-                            "grade_level" => $row['grade_level'],
-                            "fuzzy_score" => $total_ave   // <- this is the score you will rank
-                        ];
+                        "stud_no" => $row['stud_no'],
+                        "fullname" => $row['fullname'],
+                        "strand_name" => $row['strand_name'],
+                        "grade_level" => $row['grade_level'],
+                        "average" => $total_ave,
+                        "fuzzy_score" => fuzzy_rank_student($total_ave),
+                        "distinction" => get_distinction($total_ave)
+                    ];
                     }
 
-                         usort($students, function($a, $b) {
+                        usort($students, function($a, $b) {
                             return $b["fuzzy_score"] <=> $a["fuzzy_score"];
                         });
 
-                        $rank = 1;
+                        $rank = 0;                 // current rank number
+                        $position = 0;             // actual position in list
+                        $prev_score = null;        // previous fuzzy score
+
                         foreach ($students as $key => $stud) {
+                            $position++;
+
+                            // If first student OR score is different → update rank
+                            if ($prev_score === null || $stud["fuzzy_score"] != $prev_score) {
+                                $rank = $position;
+                            }
+
                             $students[$key]["rank"] = $rank;
-                            $rank++;
+                            $prev_score = $stud["fuzzy_score"];
                         }
+
 
                         foreach ($students as $s) {
                         echo "
@@ -307,6 +389,7 @@ function fuzzy_rank_student($grade) {
                             <td>{$s['grade_level']}</td>
                             <td>" . number_format((float)$s['fuzzy_score'], 2,  '.', '') . "</td>
                             <td>{$s['rank']}</td>
+                            <td><b>{$s['distinction']}</b></td>
                         </tr>";
                     }
                 }

@@ -164,7 +164,7 @@ echo "</table>";
                             "fullname" => $row['fullname'],
                             "strand_name" => $row['strand_name'],
                             "grade_level" => $row['grade_level'],
-                            "fuzzy_score" => $total_ave   // <- this is the score you will rank
+                            "fuzzy_score" => fuzzy_rank_student($total_ave)   // <- this is the score you will rank
                         ];
                     }
 
