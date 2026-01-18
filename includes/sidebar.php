@@ -66,49 +66,6 @@
               </p>
             </a>
           </li>
-          <li class="nav-item">
-            <a href="../student/list.students.php" class="nav-link">
-              <i class="nav-icon fas fa-users"></i>
-              <p>
-                Enrolled Students List
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-file"></i>
-              <p>
-                Students' Forms
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="../grade/student.record.php" class="nav-link">
-                  <i class="far fa-file nav-icon"></i>
-                  <p>Student's Permanent Record</p>
-                </a>
-              </li>
-              
-              <li class="nav-item">
-                <a href="../grade/student.summary.php" class="nav-link">
-                  <i class="far fa-file nav-icon"></i>
-                  <p>Student's Summary of Grade</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <?php
-            } elseif ($_SESSION['role'] == "Registrar")  {/////////////////////// Registrar sidebar
-          ?>
-          <li class="nav-item">
-            <a href="../faculty/faculty.load.php" class="nav-link">
-              <i class="nav-icon fas fa-users"></i>
-              <p>
-                Faculty's Load
-              </p>
-            </a>
-          </li>
 
 
           <li class="nav-item">
@@ -248,8 +205,195 @@
               </li>
             </ul>
           </li>
-
-
+          <li class="nav-item">
+            <a href="../student/list.students.php" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Enrolled SHS Students List
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="../student/list.elem.php" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Enrolled Elementary Students List
+              </p>
+            </a>
+          </li>
+          
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-file"></i>
+              <p>
+                Students' Forms
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="../grade/student.record.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Permanent Record</p>
+                </a>
+              </li>
+              
+              <li class="nav-item">
+                <a href="../grade/student.summary.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Student's Summary of Grade</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <?php
+            } elseif ($_SESSION['role'] == "Registrar")  {/////////////////////// Registrar sidebar
+          ?>
+          <li class="nav-item">
+            <a href="../faculty/faculty.load.php" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Faculty's Load
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                Students' Ranking
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="../grade/student.record.php" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Senior High School</p>
+                  <i class="right fas fa-angle-left"></i>
+                </a>
+                <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="../enrolled/grade.eleven.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 11</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.twelve.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 12</p>
+                  </a>
+                </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Junior High School</p>
+                  <i class="right fas fa-angle-left"></i>
+                </a>
+                <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="../enrolled/grade.seven.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 7</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.eight.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 8</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.nine.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 9</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.ten.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 10</p>
+                  </a>
+                </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Grade School</p>
+                  <i class="right fas fa-angle-left"></i>
+                </a>
+                <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="../enrolled/grade.one.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 1</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.two.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 2</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.three.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 3</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.four.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 4</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.five.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 5</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/grade.six.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Grade 6</p>
+                  </a>
+                </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="far fa-file nav-icon"></i>
+                  <p>Pre School</p>
+                  <i class="right fas fa-angle-left"></i>
+                </a>
+                <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="../enrolled/nursery.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Nursery</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/pre.kinder.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Pre-Kinder</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="../enrolled/kinder.php" class="nav-link">
+                    <i class="far fa-file nav-icon"></i>
+                    <p>Kinder</p>
+                  </a>
+                </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
           <li class="nav-item">
             <a href="../student/list.students.php" class="nav-link">
               <i class="nav-icon fas fa-users"></i>

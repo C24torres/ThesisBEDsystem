@@ -82,7 +82,7 @@ date_default_timezone_set('Asia/Manila');
             </b> List of Students <b>(
               <?php 
                 if($is_shs){
-                    echo $semester . ' - ' . $acadyear; 
+                    echo  $semester .' - '. $acadyear; 
                 } else {
                     echo $acadyear;
                 }
@@ -128,49 +128,117 @@ date_default_timezone_set('Asia/Manila');
               </thead>
               <tbody>
                 <?php
+                // --------------------
+                // SAFETY INITIALIZATION
+                // --------------------
+                $load_info = null;
+
+                // --------------------
+                // GET STUDENT LIST
+                // --------------------
                 if ($is_k10) {
-                    // K–10: ignore semester, get all 4 quarters for the acadyear
-                    $load_info = mysqli_query($conn, "SELECT tbl_students.student_id, img, stud_no, first_quarter, second_quarter, third_quarter, fourth_quarter,
-                              ofgrade, numgrade, remarks, absences, inc_status, updated, tbl_enrolled_subjects.last_update, enrolled_sub_id, special_tut, class_code,
-                              CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname) as fullname
-                        FROM tbl_enrolled_subjects 
-                        LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
-                        LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id
-                        LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+
+                    // K–10 (Nursery to Grade 10)
+                    $load_info = mysqli_query($conn, "SELECT 
+                            tbl_students.student_id,
+                            img,
+                            stud_no,
+                            first_quarter,
+                            second_quarter,
+                            third_quarter,
+                            fourth_quarter,
+                            ofgrade,
+                            numgrade,
+                            remarks,
+                            absences,
+                            inc_status,
+                            updated,
+                            tbl_enrolled_subjects.last_update,
+                            enrolled_sub_id,
+                            special_tut,
+                            class_code,
+                            CONCAT(
+                                tbl_students.student_lname, ', ',
+                                tbl_students.student_fname, ' ',
+                                tbl_students.student_mname
+                            ) AS fullname
+                        FROM tbl_enrolled_subjects
+                        LEFT JOIN tbl_students 
+                            ON tbl_students.student_id = tbl_enrolled_subjects.student_id
+                        LEFT JOIN tbl_schoolyears 
+                            ON tbl_schoolyears.student_id = tbl_students.student_id
+                        LEFT JOIN tbl_schedules 
+                            ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                        LEFT JOIN tbl_acadyears 
+                            ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
                         WHERE tbl_schedules.schedule_id = '$schedule_id'
                           AND tbl_schedules.section = '$section'
                           AND tbl_schoolyears.grade_level_id BETWEEN 1 AND 13
-                          AND tbl_schoolyears.acadyear = '$acadyear'
+                          AND tbl_schedules.acadyear = '$acadyear'
                           AND tbl_schoolyears.remark = 'Approved'
                         ORDER BY tbl_students.student_lname ASC
                     ");
+
                 } elseif ($is_shs) {
-                    // SHS: filter by semester, show Midterm & Final
-                    $load_info = mysqli_query($conn, "SELECT tbl_students.student_id, img, stud_no, strand_name, midterm, finalterm,
-                              ofgrade, numgrade, remarks, absences, inc_status, updated, tbl_enrolled_subjects.last_update, enrolled_sub_id, special_tut, class_code,
-                              CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname) as fullname
+
+                    // Senior High School
+                    $load_info = mysqli_query($conn, "SELECT 
+                            tbl_students.student_id,
+                            img,
+                            stud_no,
+                            strand_name,
+                            midterm,
+                            finalterm,
+                            ofgrade,
+                            numgrade,
+                            remarks,
+                            absences,
+                            inc_status,
+                            updated,
+                            tbl_enrolled_subjects.last_update,
+                            enrolled_sub_id,
+                            special_tut,
+                            class_code,
+                            CONCAT(
+                                tbl_students.student_lname, ', ',
+                                tbl_students.student_fname, ' ',
+                                tbl_students.student_mname
+                            ) AS fullname
                         FROM tbl_enrolled_subjects
-                        LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
-                        LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id
-                        LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
-                        LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
-                        LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
-                        LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
+                        LEFT JOIN tbl_students 
+                            ON tbl_students.student_id = tbl_enrolled_subjects.student_id
+                        LEFT JOIN tbl_schoolyears 
+                            ON tbl_schoolyears.student_id = tbl_students.student_id
+                        LEFT JOIN tbl_schedules 
+                            ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                        LEFT JOIN tbl_strands 
+                            ON tbl_strands.strand_id = tbl_schoolyears.strand_id
+                        LEFT JOIN tbl_acadyears 
+                            ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                        LEFT JOIN tbl_semesters 
+                            ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
                         WHERE tbl_schedules.schedule_id = '$schedule_id'
                           AND tbl_schedules.section = '$section'
                           AND tbl_schoolyears.grade_level_id BETWEEN 14 AND 15
-                          AND tbl_acadyears.academic_year = '$acadyear'
+                          AND tbl_schedules.acadyear = '$acadyear'
                           AND tbl_semesters.semester = '$semester'
                           AND tbl_schoolyears.remark = 'Approved'
                         ORDER BY tbl_students.student_lname ASC
                     ");
                 }
+                // --------------------
+                // SAFE LOOP
+                // --------------------
+                if ($load_info instanceof mysqli_result && mysqli_num_rows($load_info) > 0) {
 
-                while ($row = mysqli_fetch_array($load_info)) {
+                    while ($row = mysqli_fetch_array($load_info)) {
+                ?>
 
 
-                    // $last_updated = 0;
-                  ?>
+
+
+
+                  
                   <tr>
                     <td>
                       <?php
@@ -406,8 +474,20 @@ date_default_timezone_set('Asia/Manila');
                     </div>
                   </div>
                   <?php
-                }
+                  }
                 ?>
+                <?php
+                  } // END while
+              else {
+              ?>
+                  <tr>
+                      <td colspan="15" class="text-center text-danger">
+                          No students found for this class.
+                      </td>
+                  </tr>
+              <?php } ?>
+              </tbody>
+
               </tbody>
               <tfoot>
               </tfoot>

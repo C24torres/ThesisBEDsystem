@@ -9,8 +9,21 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
   $acadyear = $_GET['acadyear'];
   $semester = $_GET['semester'];
 } else {
-  $acadyear = $_SESSION['active_acadyear'];
+  $acadyear = $_SESSION['active_acadyears'];
   $semester = $_SESSION['active_semester'];
+}
+
+/* ✅ PUT THIS HERE — ALWAYS INITIALIZE */
+$is_senior = false;
+
+/* CHECK IF SUBJECT IS SHS */
+$checkSenior = mysqli_query($conn, "SELECT subject_id 
+    FROM tbl_subjects_senior 
+    WHERE subject_code = '$subject_code'
+");
+
+if (mysqli_num_rows($checkSenior) > 0) {
+    $is_senior = true;
 }
 ?>
 
@@ -77,12 +90,31 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
               </thead>
               <tbody>
                 <?php
-                $load_info = mysqli_query($conn, "SELECT * FROM tbl_schedules 
-                LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
-                WHERE teacher_id = '$teacher_id'
-                AND subject_code = '$subject_code'
-                AND acadyear = '$acadyear'
-                AND semester = '$semester'");
+                if ($is_senior) {
+
+                    // SHS subjects
+                    $load_info = mysqli_query($conn, "SELECT tbl_schedules.*
+                        FROM tbl_schedules
+                        INNER JOIN tbl_subjects_senior 
+                            ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
+                        WHERE tbl_schedules.teacher_id = '$teacher_id'
+                        AND tbl_subjects_senior.subject_code = '$subject_code'
+                        AND acadyear = '$acadyear'
+                    ");
+
+                } else {
+
+                    // K–10 subjects
+                    $load_info = mysqli_query($conn, "SELECT tbl_schedules.*
+                        FROM tbl_schedules
+                        INNER JOIN tbl_subjects 
+                            ON tbl_subjects.subject_id = tbl_schedules.subject_id
+                        WHERE tbl_schedules.teacher_id = '$teacher_id'
+                        AND tbl_subjects.subject_code = '$subject_code'
+                        AND acadyear = '$acadyear'
+                    ");
+
+                }
 
                 while ($row = mysqli_fetch_array($load_info))  {
                 ?>

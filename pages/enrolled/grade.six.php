@@ -10,49 +10,49 @@ if (isset($_GET['acadyear'])) {
 }
 
 function mf_low($grade) {
-    if ($grade <= 60) return 1;     // fully low
-    if ($grade >= 75) return 0;     // end of low
-    return (75 - $grade) / 15;      // linear decrease 60->75
+    if ($grade <= 60) return 1;
+    if ($grade >= 75) return 0;
+    return (75 - $grade) / 15;   // linear decrease 60->75
 }
 
+// Average membership
 function mf_average($grade) {
-    if ($grade <= 60 || $grade >= 95) return 0; // no average below 60 or above 95
-    if ($grade == 82.5) return 1;               // peak average in middle
-    if ($grade < 82.5) return ($grade - 60) / 22.5;   // increase to peak
-    return (95 - $grade) / 12.5;               // decrease from peak to 0 at 95
+    if ($grade <= 60 || $grade >= 95) return 0;
+    if ($grade == 77.5) return 1; // peak average
+    if ($grade < 77.5) return ($grade - 60) / 17.5;
+    return (95 - $grade) / 17.5;
 }
 
+// High membership
 function mf_high($grade) {
-    if ($grade <= 85) return 0;     // no high below 85
-    if ($grade >= 100) return 1;    // fully high at 100
-    return ($grade - 85) / 15;      // linear increase 85->100
+    if ($grade <= 85) return 0;
+    if ($grade >= 100) return 1;
+    return ($grade - 85) / 15;
 }
 
+// Defuzzification
+function defuzzify($low, $avg, $high, $grade) {
+    // Weighted centroid
+    $numerator = ($low * 60) + ($avg * 77.5) + ($high * 100);
+    $denominator = $low + $avg + $high;
 
-// -------------------------------
-// Defuzzification via Centroid
-// -------------------------------
-function defuzzify($low, $avg, $high) {
-    // weighted centroid formula
-    $numerator = ($low * 60) + ($avg * 82.5) + ($high * 100);
-    $denominator = ($low + $avg + $high);
+    if ($denominator == 0) return $grade; // fallback: raw grade
 
-    if ($denominator == 0) return 0;
+    $fuzzy = $numerator / $denominator;
 
-    return $numerator / $denominator;
+    // Clamp fuzzy score to raw grade maximum
+    if ($fuzzy > $grade) $fuzzy = $grade;
+
+    return $fuzzy;
 }
 
-// -------------------------------
-// Fuzzy Ranking Function
-// -------------------------------
+// Fuzzy ranking function
 function fuzzy_rank_student($grade) {
-    // fuzzification
     $low = mf_low($grade);
     $avg = mf_average($grade);
     $high = mf_high($grade);
 
-    // defuzzification
-    return defuzzify($low, $avg, $high);
+    return defuzzify($low, $avg, $high, $grade);
 }
 
 function get_distinction($average) {
@@ -124,7 +124,7 @@ function get_distinction($average) {
                       <div class="modal-content">
                         <div class="modal-header">
                           <h4 class="modal-title">Select <b>
-                              Semester and Academic Year
+                              Academic Year
                             </b></h4>
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -182,6 +182,7 @@ function get_distinction($average) {
                   <th>Student Number</th>
                   <th>Student</th>
                   <th>Grade Level</th>
+                  <th>Average (Raw)</th>
                   <th>Fuzzy Scores</th>
                   <th>Rank</th>
                   <th>Distinction</th>
@@ -202,10 +203,9 @@ function get_distinction($average) {
                     INNER JOIN tbl_students ON tbl_students.student_id = tbl_schoolyears.student_id
                     LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
                     LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
-                    LEFT JOIN tbl_semesters ON tbl_semesters.semester_id = tbl_schoolyears.semester_id
                     WHERE tbl_acadyears.academic_year = '$acadyear'
                     AND tbl_schoolyears.remark = 'Approved'
-                    AND tbl_grade_levels.grade_level_id = 19
+                    AND tbl_grade_levels.grade_level_id = 9
                     AND (student_fname LIKE '%$search%'
                     OR student_mname LIKE '%$search%'
                     OR student_lname LIKE '%$search%'
@@ -216,20 +216,27 @@ function get_distinction($average) {
                     while ($row = mysqli_fetch_array($student_info))  {
 
                         // compute average grade
-                        $grade_info = mysqli_query($conn, "SELECT * FROM tbl_enrolled_subjects
-                            LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
-                            LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
-                            WHERE student_id = '$row[student_id]'
-                            AND tbl_subjects_senior.semester_id = '$_SESSION[active_semester_id]'
-                            AND tbl_schedules.acadyear = '$_SESSION[active_acadyears]'");
+                       $grade_info = mysqli_query($conn, "SELECT 
+                                COUNT(tbl_enrolled_subjects.enrolled_sub_id) AS total_subjects,
+                                COALESCE(SUM(tbl_enrolled_subjects.ofgrade), 0) AS total_grade
+                            FROM tbl_enrolled_subjects
+                            LEFT JOIN tbl_schedules 
+                                ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                            LEFT JOIN tbl_subjects 
+                                ON tbl_subjects.subject_id = tbl_schedules.subject_id
+                            WHERE tbl_enrolled_subjects.student_id = '$row[student_id]'
+                            AND tbl_schedules.acadyear = '$acadyear'
+                        ");
 
-                        $average = 0;
-                        $index = 0;
-                        while($row1 = mysqli_fetch_array($grade_info))  {
-                            $average += $row1['ofgrade'];
-                            $index++;
-                        }
-                        $total_ave = ($index > 0) ? $average / $index : 0;
+                        $row_grade = mysqli_fetch_assoc($grade_info);
+
+                        $total_subjects = $row_grade['total_subjects'];
+                        $total_grade    = $row_grade['total_grade'];
+
+                        $total_ave = ($total_subjects > 0)
+                            ? $total_grade / $total_subjects
+                            : 0;
+
 
                         // PUSH into array
                         $students[] = [
@@ -242,14 +249,24 @@ function get_distinction($average) {
                     ];
                     }
 
-                         usort($students, function($a, $b) {
+                        usort($students, function($a, $b) {
                             return $b["fuzzy_score"] <=> $a["fuzzy_score"];
                         });
 
-                        $rank = 1;
+                        $rank = 0;                 // current rank number
+                        $position = 0;             // actual position in list
+                        $prev_score = null;        // previous fuzzy score
+
                         foreach ($students as $key => $stud) {
+                            $position++;
+
+                            // If first student OR score is different → update rank
+                            if ($prev_score === null || $stud["fuzzy_score"] != $prev_score) {
+                                $rank = $position;
+                            }
+
                             $students[$key]["rank"] = $rank;
-                            $rank++;
+                            $prev_score = $stud["fuzzy_score"];
                         }
 
                         foreach ($students as $s) {
@@ -258,6 +275,7 @@ function get_distinction($average) {
                             <td>{$s['stud_no']}</td>
                             <td>{$s['fullname']}</td>
                             <td>{$s['grade_level']}</td>
+                            <td>" . number_format((float)$s['average'], 2, '.', '') . "</td>
                             <td>" . number_format((float)$s['fuzzy_score'], 2,  '.', '') . "</td>
                             <td>{$s['rank']}</td>
                             <td><b>{$s['distinction']}</b></td>

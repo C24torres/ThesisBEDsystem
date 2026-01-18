@@ -64,16 +64,44 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
               <div class="card-tools">
               </div>
           </div>
-          <div class="card-body">
+          <div class="card-body" <?php
+            $level_check = mysqli_query($conn, "SELECT tbl_grade_levels.grade_level_id
+              FROM tbl_schoolyears
+              LEFT JOIN tbl_grade_levels 
+                ON tbl_schoolyears.grade_level_id = tbl_grade_levels.grade_level_id
+              WHERE student_id = '$student_id'
+              AND remark = 'Approved'
+              ORDER BY tbl_schoolyears.ay_id DESC
+              LIMIT 1
+            ");
+
+            $level_row = mysqli_fetch_assoc($level_check);
+
+            $is_k10 = ($level_row['grade_level_id'] >= 1 && $level_row['grade_level_id'] <= 13);
+            $is_shs = ($level_row['grade_level_id'] >= 14 && $level_row['grade_level_id'] <= 15);
+            ?>
+            >
             <table id="example3" class="table table-bordered table-hover">
               <thead>
                 <tr>
                   <th>Subject Code</th>
                   <th>Subject Description</th>
-                  <th>Midterm</th>
-                  <th>Finalterm</th>
-                  <th>Numerical Grade</th>
-                  <th>Final Grade</th>
+
+                  <?php if ($is_k10) { ?>
+                    <th>1st Quarter</th>
+                    <th>2nd Quarter</th>
+                    <th>3rd Quarter</th>
+                    <th>4th Quarter</th>
+                    <th>Numerical Grade</th>
+                    <th>Final Grade</th>
+                  <?php } elseif ($is_shs) { ?>
+                    <th>Midterm</th>
+                    <th>Finalterm</th>
+                    <th>Numerical Grade</th>
+                    <th>Final Grade</th>
+                  <?php } ?>
+
+                  
                 </tr>
               </thead>
               <tbody>
@@ -86,15 +114,29 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
                 WHERE student_id = '$student_id' AND remark = 'Approved'
                 ORDER BY tbl_grade_levels.grade_level_id ASC, tbl_semesters.semester_id ASC");
                 while ($row = mysqli_fetch_array($sy_info)) {
-
+                  $is_k10 = ($row['grade_level_id'] >= 1 && $row['grade_level_id'] <= 13);
+                  $is_shs = ($row['grade_level_id'] >= 14 && $row['grade_level_id'] <= 15);
                 ?>
                 <tr>
-                  <td><b><?php echo $row['grade_level'].'<br>'. $row['semester'].' - '. $row['academic_year']?></b></td>
-                  <td><b><?php echo $row['strand_def']?></b></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  
+                  <?php if ($is_k10) { ?>
+                    <td><b><?php echo $row['grade_level'].'<br>'. $row['semester'].' - '. $row['academic_year']?></b></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    
+                  <?php } elseif ($is_shs) { ?>
+                    <td><b><?php echo $row['grade_level'].'<br>'. $row['semester'].' - '. $row['academic_year']?></b></td>
+                    <td><b><?php echo $row['strand_def']?></b></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  <?php } ?>
                   
                 </tr>
                 <?php
@@ -140,10 +182,19 @@ if (($_SESSION['role'] == 'Registrar' || $_SESSION['role'] == 'Enrollment Staff'
                   <?php
                   } else {
                   ?>
-                  <td><?php echo $row2['midterm']?></td>
-                  <td><?php echo $row2['finalterm']?></td>
-                  <td><?php echo $row2['numgrade']?></td>
-                  <td><?php echo $row2['ofgrade']?></td>
+                  <?php if ($is_k10) { ?>
+                    <td><?php echo $row2['first_quarter']; ?></td>
+                    <td><?php echo $row2['second_quarter']; ?></td>
+                    <td><?php echo $row2['third_quarter']; ?></td>
+                    <td><?php echo $row2['fourth_quarter']; ?></td>
+                    <td><?php echo $row2['numgrade']; ?></td>
+                    <td><?php echo $row2['ofgrade']; ?></td>
+                  <?php } elseif ($is_shs) { ?>
+                    <td><?php echo $row2['midterm']; ?></td>
+                    <td><?php echo $row2['finalterm']; ?></td>
+                    <td><?php echo $row2['numgrade']; ?></td>
+                    <td><?php echo $row2['ofgrade']; ?></td>
+                  <?php } ?>
                 </tr>
                 <?php
                   }

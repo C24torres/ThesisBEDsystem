@@ -104,15 +104,17 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                                   <select class="form-control select2" name="new_class_id">
                                     <option selected disabled>Select section</option>
                                     <?php
-                                    $current_sched = mysqli_query($conn, "SELECT * FROM tbl_schedules WHERE schedule_id = '$schedule_id' AND section = '$section'");
+                                    $current_sched = mysqli_query($conn, "SELECT * FROM tbl_schedules 
+                                    LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_code = tbl_schedules.class_code
+                                    WHERE schedule_id = '$schedule_id' AND tbl_schedules.section = '$section'");
                                     $row = mysqli_fetch_array($current_sched);
                                     $sechedules_info = mysqli_query($conn, "SELECT * FROM tbl_schedules
                                     LEFT JOIN tbl_subjects_senior ON tbl_schedules.subject_id = tbl_subjects_senior.subject_id
                                     LEFT JOIN tbl_teachers ON tbl_schedules.teacher_id = tbl_teachers.teacher_id
-                                    WHERE class_code = '$row[class_code]' AND acad_year = '$acadyear' AND semester = '$semester' AND section NOT IN ('$section')");
+                                    WHERE subject_code = '$row[subject_code]' AND acadyear = '$acadyear' AND semester = '$semester' AND tbl_schedules.section NOT IN ('$section')");
                                     while ($row1 = mysqli_fetch_array($sechedules_info)) {
                                     ?>
-                                    <option value="<?php echo $row1['schedule_id']?>"><?php echo $row1['class_code'] .' - '. $row1['section'] .' ('. $row1['teacher_lname'] .')'?></option></option>
+                                    <option value="<?php echo $row1['schedule_id']?>"><?php echo $row1['subject_code'] .' - '. $row1['tbl_schedules.section'] .' ('. $row1['teacher_lname'] .')'?></option>
                                     <?php
                                     }
                                     ?>
@@ -157,20 +159,27 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                 LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id
                 LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
                 LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
+                LEFT JOIN tbl_acadyears ON tbl_acadyears.academic_year = tbl_enrolled_subjects.acad_year
+                LEFT JOIN tbl_semesters ON tbl_semesters.semester = tbl_enrolled_subjects.semester
                 WHERE tbl_schedules.schedule_id = '$schedule_id'
                 AND tbl_schedules.section = '$section' 
-                AND tbl_schoolyears.ay_id = '$acadyear'
-                AND tbl_schoolyears.semester_id = '$semester'
+                AND tbl_acadyears.academic_year = '$acadyear'
+                AND tbl_semesters.semester = '$semester'
                 AND tbl_schoolyears.remark = 'Approved'
                 ORDER BY student_lname ASC");
 
                   while ($row = mysqli_fetch_array($load_info)) {
-                    $last_updated = new DateTime($row['last_update']);
+                    if (!empty($row['last_update'])) {
+                        $last_updated = new DateTime($row['last_update']);
+                    } else {
+                        $last_updated = null;
+                    }
+
                     ?>
                     <tr>
                       <td>
                         <div class="form-check">
-                          <input type="checkbox" class="form-check-input select-all" id="exampleCheck1" value="<?php echo $row['enrolled_subject_id']?>" name="enrolled_subject_id[]">
+                          <input type="checkbox" class="form-check-input select-all" value="<?= $row['enrolled_sub_id'] ?>" name="enrolled_sub_id[]">
                         </div>
                       </td>
                       <td>

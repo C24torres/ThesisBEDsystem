@@ -133,49 +133,29 @@ if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
               </thead>
               <tbody>
                 <?php
-                // Nursery to Grade 10: filter by acadyear only
-                $basic_load_info = mysqli_query($conn, "
-                    SELECT tbl_schedules.*, tbl_subjects.subject_code, tbl_subjects.subject_description
-                    FROM tbl_schedules
-                    LEFT JOIN tbl_subjects ON tbl_subjects.subject_id = tbl_schedules.subject_id
-                    WHERE tbl_schedules.teacher_id = '$teacher_id'
-                    AND tbl_schedules.acadyear = '$acadyear'
-                    GROUP BY tbl_subjects.subject_code
+                $load_info = mysqli_query($conn, "SELECT 
+                    tbl_schedules.*,
+                    COALESCE(tbl_subjects.subject_code, tbl_subjects_senior.subject_code) AS subject_code,
+                    COALESCE(tbl_subjects.subject_description, tbl_subjects_senior.subject_description) AS subject_description
+                FROM tbl_schedules
+                LEFT JOIN tbl_subjects  
+                    ON tbl_subjects.subject_id = tbl_schedules.subject_id
+                LEFT JOIN tbl_subjects_senior
+                    ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
+                WHERE tbl_schedules.teacher_id = '$teacher_id'
+                AND tbl_schedules.acadyear = '$acadyear'
+                GROUP BY subject_code
                 ");
 
-                // SHS: filter by acadyear AND semester
-                $shs_load_info = mysqli_query($conn, "
-                    SELECT tbl_schedules.*, tbl_subjects_senior.subject_code, tbl_subjects_senior.subject_description
-                    FROM tbl_schedules
-                    LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
-                    WHERE tbl_schedules.teacher_id = '$teacher_id'
-                    AND tbl_schedules.acadyear = '$acadyear'
-                    AND tbl_schedules.semester = '$semester'
-                    GROUP BY tbl_subjects_senior.subject_code
-                ");
 
-                // Loop for Basic Ed
-                while ($row = mysqli_fetch_array($basic_load_info)) {
-                    ?>
-                    <tr>
-                        <td><b><?php echo $row['subject_code']; ?></b> - <?php echo $row['subject_description']; ?></td>
-                        <td>
-                            <a href="section.load.php?subject_code=<?php echo $row['subject_code']; ?>&teacher_id=<?php echo $row['teacher_id']; ?>&subject_description=<?php echo $row['subject_description']; ?>&acadyear=<?php echo $acadyear?>" class="btn btn-primary btn-sm">View Sections</a>
-                        </td>
-                    </tr>
-                    <?php
-                }
-
-                // Loop for SHS
-                while ($row = mysqli_fetch_array($shs_load_info)) {
-                    ?>
-                    <tr style="background-color: #f0f8ff;">
-                        <td><b><?php echo $row['subject_code']; ?></b> - <?php echo $row['subject_description']; ?></td>
-                        <td>
-                            <a href="section.load.php?subject_code=<?php echo $row['subject_code']; ?>&teacher_id=<?php echo $row['teacher_id']; ?>&subject_description=<?php echo $row['subject_description']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View Sections</a>
-                        </td>
-                    </tr>
-                    <?php
+                while ($row = mysqli_fetch_array($load_info))  {
+                ?>
+                <tr>
+                  <td><b><?php echo $row['subject_code'].'</b> - '. $row['subject_description']; ?></td>
+                  <td><a href="section.load.php?subject_code=<?php echo $row['subject_code']; ?>&teacher_id=<?php echo $row['teacher_id']; ?>&subject_description=<?php echo $row['subject_description']; ?>&acadyear=<?php echo $acadyear?>" class="btn btn-primary btn-sm">View Sections</a>
+                  </td>
+                </tr>
+                <?php
                 }
                 ?>
               </tbody>

@@ -1,12 +1,10 @@
 <?php
 require '../../includes/session.php';
 
-if (isset($_POST['semester']) && isset($_POST['acadyear'])) {
+if ( isset($_POST['acadyear'])) {
     $acadyear = $_POST['acadyear'];
-    $semester = $_POST['semester'];
   } else {
     $acadyear = $_SESSION['active_acadyears'];
-    $semester = $_SESSION['active_semester'];
   }
 
 if ($_SESSION['role'] == "Student") {
@@ -100,25 +98,7 @@ if ($_SESSION['role'] == "Student") {
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <label>Semester</label>
-                                        <select class="form-control select2" name="semester" style="width: 100%;">
-                                            <?php
-                                            $sem_info = mysqli_query($conn, "SELECT * FROM tbl_semesters WHERE semester = '$semester'");
-                                            while ($row = mysqli_fetch_array($sem_info)) {
-                                                ?>
-                                                <option selected value="<?php echo $row['semester']; ?>"><?php echo $row['semester']; ?></option>
-                                            <?php } ?>
-                                            <?php
-                                            $sem_info = mysqli_query($conn, "SELECT * FROM tbl_semesters WHERE NOT semester = '$semester'");
-                                            while ($row = mysqli_fetch_array($sem_info)) {
-                                                ?>
-                                                <option value="<?php echo $row['semester']; ?>"><?php echo $row['semester']; ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
+                                
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label>Academic Year</label>
@@ -127,13 +107,13 @@ if ($_SESSION['role'] == "Student") {
                                             $ay_info = mysqli_query($conn, "SELECT * FROM tbl_acadyears WHERE academic_year = '$acadyear' ORDER BY academic_year DESC");
                                             while ($row = mysqli_fetch_array($ay_info)) {
                                                 ?>
-                                                <option value="<?php echo $row['academic_year'] ?>"><?php echo $row['academic_year'] ?></option>
+                                                <option value="<?php echo $row['ay_id'] ?>"><?php echo $row['academic_year'] ?></option>
                                             <?php } ?>
                                             <?php
                                             $ay_info = mysqli_query($conn, "SELECT * FROM tbl_acadyears WHERE NOT academic_year = '$acadyear' ORDER BY academic_year DESC");
                                             while ($row = mysqli_fetch_array($ay_info)) {
                                                 ?>
-                                                <option value="<?php echo $row['academic_year'] ?>"><?php echo $row['academic_year'] ?></option>
+                                                <option value="<?php echo $row['ay_id'] ?>"><?php echo $row['academic_year'] ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>
@@ -142,8 +122,7 @@ if ($_SESSION['role'] == "Student") {
                         </div>
                         <!-- /.card-body -->
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary btn-sm float-right" name="submit">Search
-                                Record</button>
+                            <button type="submit" class="btn btn-primary btn-sm float-right" name="submit">Search Record</button>
                         </div>
                     </form>
                     <!-- /.card-footer-->
@@ -151,58 +130,70 @@ if ($_SESSION['role'] == "Student") {
                 <!-- /.card -->
                 <?php
                     if (isset($student_id)) {
-
-                        echo 1;
                     $stud_info = mysqli_query($conn, "SELECT *, CONCAT(student_lname, ', ', student_fname, ' ', student_mname) as fullname FROM tbl_students 
-                    LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id WHERE tbl_schoolyears.student_id = '$student_id' AND tbl_schoolyears.ay_id = '$acadyear' AND tbl_schoolyears.semester_id = '$semester'");
+                    LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id WHERE tbl_schoolyears.student_id = '$student_id' AND tbl_schoolyears.ay_id = '$acadyear' ");
                     if (mysqli_num_rows($stud_info) != 0) {
-                        echo 2;
                     $row = mysqli_fetch_array($stud_info);
+                    $grade_level = $row['grade_level_id']; // Make sure this is the correct column
 
+                    $is_k10 = ($grade_level >= 1 && $grade_level <= 13);
+                    $is_shs = ($grade_level == 14 || $grade_level == 15);
                     ?>
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <b><?php echo $row['fullname']; ?>'s </b> Permanent Record for <b><?php echo $semester .' - '. $acadyear?></b>
+                                <b><?php
+                                
+
+                                // Get academic year
+                                $ay_q = mysqli_query($conn, "SELECT academic_year FROM tbl_acadyears WHERE ay_id = '$acadyear'");
+                                $ay_row = mysqli_fetch_array($ay_q);
+                                $acadyear_name = $ay_row ? $ay_row['academic_year'] : '';
+                                echo $row['fullname']; ?>'s </b> Permanent Record for 
+                                <b><?php echo  $acadyear_name; ?></b>
                             </h3>
-                            <div class="card-tools">
-                                <?php
-                                if ($_SESSION['role'] == "Registrar" || $_SESSION['role'] == "Student" && $row['accounting_status'] != "Disabled") {
-                                ?>
-                                <a class="btn btn-primary btn-sm" href="../forms/student.gwa.php?student_id=<?php echo $row['student_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>">Check GWA</a>
-                                <?php
-                                }
-                                if ($_SESSION['role'] == "Super Administrator" || $_SESSION['role'] == "Registrar" || $_SESSION['role'] == "Enrollment Staff") {
-                                ?>
-                                <a class="btn btn-primary btn-sm" href="../forms/student.permanent.record.php?student_id=<?php echo $row['student_id']?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>">Permanent Record</a>
-                                <?php
-                                }
-                                ?>
-                            </div>
+                            
                         </div>
                         <div class="card-body">
                             <table id="example2" class="table table-bordered table-hover">
                                 <thead>
-                                    <tr>
-                                        <th>Subject Code</th>
-                                        <th>Subject Description</th>
+                                <tr>
+                                    <th>Subject Code</th>
+                                    <th>Subject Description</th>
+
+                                    <?php if ($is_k10): ?>
+                                        <th>1st Quarter</th>
+                                        <th>2nd Quarter</th>
+                                        <th>3rd Quarter</th>
+                                        <th>4th Quarter</th>
+                                    <?php else: ?>
                                         <th>Midterm</th>
                                         <th>Finalterm</th>
-                                        <th>Final Grade</th>
-                                        <th>Numerical Grade</th>
-                                        <th>Remarks</th>
-                                    </tr>
+                                    <?php endif; ?>
+
+                                    <th>Final Grade</th>
+                                    <th>Numerical Grade</th>
+                                    <th>Remarks</th>
+                                </tr>
                                 </thead>
+
                                 <tbody>
                                     <?php
-                                    $stud_info = mysqli_query($conn, "SELECT * FROM tbl_enrolled_subjects
-                                    LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_enrolled_subjects.subject_id
-                                    WHERE student_id = '$student_id' AND academic_year = '$acadyear' AND semester = '$semester'");
+                                    $stud_info = mysqli_query($conn, "SELECT tbl_enrolled_subjects.*,
+                                        COALESCE(tbl_subjects.subject_code, tbl_subjects_senior.subject_code) AS subject_code,
+                                        COALESCE(tbl_subjects.subject_description, tbl_subjects_senior.subject_description) AS subject_description
+                                    FROM tbl_enrolled_subjects
+                                    LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                                    LEFT JOIN tbl_subjects_senior ON tbl_subjects_senior.subject_id = tbl_schedules.subject_id
+                                    LEFT JOIN tbl_subjects ON tbl_subjects.subject_id = tbl_schedules.subject_id
+                                    LEFT JOIN tbl_acadyears ON tbl_acadyears.academic_year = tbl_schedules.acadyear
+                                    WHERE tbl_enrolled_subjects.student_id = '$student_id'  AND tbl_acadyears.ay_id = '$acadyear'");
                                     while ($row2 = mysqli_fetch_array($stud_info)) {
                                         $faculty_info = mysqli_query($conn, "SELECT *, CONCAT(teacher_lname, ', ', teacher_fname, ' ', teacher_mname) AS teacher_name FROM tbl_teachers
                                         LEFT JOIN tbl_schedules ON tbl_schedules.teacher_id = tbl_teachers.teacher_id WHERE schedule_id = '$row2[schedule_id]'");
 
                                         $row3 = mysqli_fetch_array($faculty_info);
+                                        $teacher_name = $row3 ? $row3['teacher_name'] : 'TBA';
 
                                         if ($_SESSION['role'] == "Student" && $row['accounting_status'] == "Disabled") {
                                         ?>
@@ -218,21 +209,21 @@ if ($_SESSION['role'] == "Student") {
                                                 <?php echo $row2['subject_code']; ?>
                                             </td>
                                             <td>
-                                                <?php echo $row2['subject_description']; ?><br>Instructor: <?php echo $row3['teacher_name']; ?>
+                                                <?php echo $row2['subject_description']; ?><br>Instructor: <?php echo $teacher_name; ?>
                                             </td>
                                             
-                                            <td>
-                                                <?php echo $row2['midterm']; ?>
-                                            </td>
-                                            <td>
-                                                <?php echo $row2['finalterm']; ?>
-                                            </td>
-                                            <td>
-                                                <?php echo $row2['ofgrade']; ?>
-                                            </td>
-                                            <td>
-                                                <?php echo $row2['numgrade']; ?>
-                                            </td>
+                                            <?php if ($is_k10): ?>
+                                                <td><?php echo $row2['first_quarter']; ?></td>
+                                                <td><?php echo $row2['second_quarter']; ?></td>
+                                                <td><?php echo $row2['third_quarter']; ?></td>
+                                                <td><?php echo $row2['fourth_quarter']; ?></td>
+                                            <?php else: ?>
+                                                <td><?php echo $row2['midterm']; ?></td>
+                                                <td><?php echo $row2['finalterm']; ?></td>
+                                            <?php endif; ?>
+
+                                            <td><?php echo $row2['ofgrade']; ?></td>
+                                            <td><?php echo $row2['numgrade']; ?></td>
                                             <?php
                                             if ($row2['remarks'] == "Passed") {
                                             ?>
@@ -265,7 +256,7 @@ if ($_SESSION['role'] == "Student") {
                         </div>
                     </div>
                     <?php
-                    } }
+                    }}
                     ?>
             </section>
             <!-- /.content -->

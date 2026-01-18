@@ -8,7 +8,7 @@
     $server = 'localhost';
     $username = 'root';
     $password = '';
-    $db = 'BED_enrollment';
+    $db = 'bed_enrollment';
 
     $conn = new mysqli($server, $username, $password, $db, 3307);
 

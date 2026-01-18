@@ -181,7 +181,6 @@ if (isset($_GET['acadyear'])) {
                     LEFT JOIN tbl_strands ON tbl_strands.strand_id = tbl_schoolyears.strand_id
                     LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
                     LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
-                    
                     WHERE tbl_acadyears.academic_year = '$acadyear'
                     AND tbl_grade_levels.grade_level_id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
                     AND tbl_schoolyears.remark = 'Approved'
@@ -208,7 +207,7 @@ if (isset($_GET['acadyear'])) {
                       Forms
                     </button>
                     <ul class="dropdown-menu">
-                      <li class="dropdown-item"><a href="../forms/student.permanent.record.php?student_id=<?php echo $row['student_id']?>">Permanent Record</a></li>
+                      <li class="dropdown-item"><a href="../grade/student.record.php?student_id=<?php echo $row['student_id']?>">Permanent Record</a></li>
                       <li class="dropdown-divider"></li>
                       <li class="dropdown-item"><a href="../grade/summary.grade.php?student_id=<?php echo $row['student_id']?>">Summary of Grade</a></li>
                     </ul>

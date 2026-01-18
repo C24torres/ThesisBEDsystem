@@ -81,7 +81,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
             </b> List of Students <b>(
               <?php 
                 if($is_shs){
-                    echo $semester . ' - ' . $acadyear; 
+                    echo  $acadyear; 
                 } else {
                     echo $acadyear;
                 }
@@ -129,10 +129,11 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                         LEFT JOIN tbl_students ON tbl_students.student_id = tbl_enrolled_subjects.student_id
                         LEFT JOIN tbl_schoolyears ON tbl_schoolyears.student_id = tbl_students.student_id
                         LEFT JOIN tbl_schedules ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                        LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
                         WHERE tbl_schedules.schedule_id = '$schedule_id'
                           AND tbl_schedules.section = '$section'
                           AND tbl_schoolyears.grade_level_id BETWEEN 1 AND 13
-                          AND tbl_schoolyears.acadyear = '$acadyear'
+                          AND tbl_acadyears.academic_year = '$acadyear'
                           AND tbl_schoolyears.remark = 'Approved'
                         ORDER BY tbl_students.student_lname ASC
                     ");
@@ -209,7 +210,7 @@ if (isset($_GET['semester']) && isset($_GET['acadyear'])) {
                         </td>
                         <td>
                           <input type="text" class="form-control" placeholder="Enter ..." onkeyup="ofGrade()"
-                          name="fourth_quarter[]" id="finalterm" value="<?php echo $row['finalterm'] ?>">
+                          name="fourth_quarter[]" id="fourth_quarter" value="<?php echo $row['fourth_quarter'] ?>">
                         </td>
                         
                     <?php endif; ?>
