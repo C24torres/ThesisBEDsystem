@@ -125,7 +125,7 @@ if (mysqli_num_rows($checkSenior) > 0) {
                   <td><?php echo $row['room']; ?></td>
                   <td>
                     <?php
-                    if ($_SESSION['role'] == "Registrar" || $_SESSION['role'] == "Faculty Staff") {
+                    if ($_SESSION['role'] == "Registrar" || $_SESSION['role'] == "Faculty Staff" || $_SESSION['role'] == "Super Administrator") {
                     ?>
                       <a href="class.php?schedule_id=<?php echo $row['schedule_id']; ?>&section=<?php echo $row['section']; ?>&acadyear=<?php echo $acadyear?>&semester=<?php echo $semester?>" class="btn btn-primary btn-sm">View Class</a>
                     <?php

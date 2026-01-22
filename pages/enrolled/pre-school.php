@@ -1,0 +1,328 @@
+<?php
+require '../../includes/session.php';
+
+if (isset($_GET['grade_level'])) {
+    $grade_level = $_GET['grade_level'];
+} else {
+    $grade_level = 'Nursery';
+}
+
+if (isset($_GET['acadyear'])) {
+    $acadyear = $_GET['acadyear'];
+    
+} else {
+    $acadyear = $_SESSION['active_acadyears'];
+    
+}
+
+function mf_low($grade) {
+    if ($grade <= 60) return 1;
+    if ($grade >= 75) return 0;
+    return (75 - $grade) / 15;   // linear decrease 60->75
+}
+
+// Average membership
+function mf_average($grade) {
+    if ($grade <= 60 || $grade >= 95) return 0;
+    if ($grade == 77.5) return 1; // peak average
+    if ($grade < 77.5) return ($grade - 60) / 17.5;
+    return (95 - $grade) / 17.5;
+}
+
+// High membership
+function mf_high($grade) {
+    if ($grade <= 85) return 0;
+    if ($grade >= 100) return 1;
+    return ($grade - 85) / 15;
+}
+
+// Defuzzification
+function defuzzify($low, $avg, $high, $grade) {
+    // Weighted centroid
+    $numerator = ($low * 60) + ($avg * 77.5) + ($high * 100);
+    $denominator = $low + $avg + $high;
+
+    if ($denominator == 0) return $grade; // fallback: raw grade
+
+    $fuzzy = $numerator / $denominator;
+
+    // Clamp fuzzy score to raw grade maximum
+    if ($fuzzy > $grade) $fuzzy = $grade;
+
+    return $fuzzy;
+}
+
+// Fuzzy ranking function
+function fuzzy_rank_student($grade) {
+    $low = mf_low($grade);
+    $avg = mf_average($grade);
+    $high = mf_high($grade);
+
+    return defuzzify($low, $avg, $high, $grade);
+}
+
+function get_distinction($average) {
+    if ($average >= 98 && $average <= 100) {
+        return "With Highest Honors";
+    } elseif ($average >= 95 && $average <= 97.99) {
+        return "With High Honors";
+    } elseif ($average >= 90 && $average <= 94.99) {
+        return "With Honors";
+    } else {
+        return "—";
+    }
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enter Schedule for Primary to JHS | BED Las Piñas</title>
+
+  <?php include '../../includes/links.php'; ?>
+
+</head>
+
+<body class="hold-transition layout-fixed layout-navbar-fixed layout-footer-fixed">
+  <div class="wrapper">
+
+    <?php include '../../includes/navbar.php' ?>
+
+    <?php include '../../includes/sidebar.php' ?>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0">Student List <b><?php echo $acadyear?></b></h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#"></a></li>
+                <li class="breadcrumb-item active"></li>
+              </ol>
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.content-header -->
+
+      <!-- Main content -->
+      <section class="content">
+        <!-- Default box -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Subject List for <b><?php echo $grade_level?></b></h3>
+            <div class="card-tools">
+                <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-md1">Set AcadYear</button>
+            </div>
+                  <div class="modal fade" id="modal-md1">
+                    <div class="modal-dialog modal-md">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Select <b>
+                              Academic Year
+                            </b></h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <form 
+                          method="GET">
+                          <div class="modal-body">
+                            <div class="row justify-content-center">
+                              
+                              <div class="col-sm-12">
+                                <div class="form-group">
+                                  <label>Academic Year</label>
+                                  <select class="form-control select2" name="acadyear">
+                                    <?php
+                                    $select_sem = mysqli_query($conn, 'SELECT * FROM tbl_acadyears');
+                                    while ($row = mysqli_fetch_array($select_sem)) {
+                                        ?>
+                                        <option value='<?php echo $row['academic_year']?>'><?php echo $row['academic_year']?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" name="submit_all" class="btn btn-primary">Save changes</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+          </div>
+          
+          <div class="card-body">
+            <form method="GET">
+                <div class="row justify-content-center">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <select class="form-control select2 select2-info custom-select" data-dropdown-css-class="select2-info" data-placeholder="Select Grade Level" name="grade_level" required>
+                                    <?php
+                                    $query = mysqli_query($conn, "SELECT * from tbl_grade_levels WHERE grade_level = '$grade_level'");
+                                    while ($row2 = mysqli_fetch_array($query)) {
+                                        echo '<option selected value="' . $row2['grade_level'] . '">' . $row2['grade_level'] . '</option>';
+                                    }
+                                    ?>
+                                    <?php
+                                    $query = mysqli_query($conn, "SELECT * from tbl_grade_levels WHERE grade_level NOT IN ('$grade_level') AND grade_level_id NOT IN (4,5,6,7,8,9,10,11,12,13,14,15)");
+                                    while ($row2 = mysqli_fetch_array($query)) {
+                                        echo '<option value="' . $row2['grade_level'] . '">' . $row2['grade_level'] . '</option>';
+                                    }
+                                    ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+          </div>
+          <div class="card-body">
+            <table id="example2" class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Student Number</th>
+                  <th>Student</th>
+                  <th>Grade Level</th>
+                  <th>Average (Raw)</th>
+                  <th>Fuzzy Scores</th>
+                  <th>Rank</th>
+                  <th>Distinction</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+
+                $students = []; // array to store all students + fuzzy score
+
+                
+                    $student_info = mysqli_query($conn, "SELECT stud_no, grade_level, tbl_students.student_id, 
+                    CONCAT(tbl_students.student_lname, ', ', tbl_students.student_fname, ' ', tbl_students.student_mname)  as fullname
+                    FROM tbl_schoolyears
+                    INNER JOIN tbl_students ON tbl_students.student_id = tbl_schoolyears.student_id
+                    LEFT JOIN tbl_grade_levels ON tbl_grade_levels.grade_level_id = tbl_schoolyears.grade_level_id
+                    LEFT JOIN tbl_acadyears ON tbl_acadyears.ay_id = tbl_schoolyears.ay_id
+                    WHERE tbl_acadyears.academic_year = '$acadyear'
+                    AND tbl_schoolyears.remark = 'Approved'
+                    AND tbl_grade_levels.grade_level = '$grade_level'
+                    ORDER BY fullname");
+
+                    while ($row = mysqli_fetch_array($student_info))  {
+
+                        // compute average grade
+                       $grade_info = mysqli_query($conn, "SELECT 
+                                COUNT(tbl_enrolled_subjects.enrolled_sub_id) AS total_subjects,
+                                COALESCE(SUM(tbl_enrolled_subjects.ofgrade), 0) AS total_grade
+                            FROM tbl_enrolled_subjects
+                            LEFT JOIN tbl_schedules 
+                                ON tbl_schedules.schedule_id = tbl_enrolled_subjects.schedule_id
+                            LEFT JOIN tbl_subjects 
+                                ON tbl_subjects.subject_id = tbl_schedules.subject_id
+                            WHERE tbl_enrolled_subjects.student_id = '$row[student_id]'
+                            AND tbl_schedules.acadyear = '$acadyear'
+                        ");
+
+                        $row_grade = mysqli_fetch_assoc($grade_info);
+
+                        $total_subjects = $row_grade['total_subjects'];
+                        $total_grade    = $row_grade['total_grade'];
+
+                        $total_ave = ($total_subjects > 0)
+                            ? $total_grade / $total_subjects
+                            : 0;
+
+
+                        // PUSH into array
+                        $students[] = [
+                        "stud_no" => $row['stud_no'],
+                        "fullname" => $row['fullname'],
+                        "grade_level" => $row['grade_level'],
+                        "average" => $total_ave,
+                        "fuzzy_score" => fuzzy_rank_student($total_ave),
+                        "distinction" => get_distinction($total_ave)
+                    ];
+                    }
+
+                        usort($students, function($a, $b) {
+                            return $b["fuzzy_score"] <=> $a["fuzzy_score"];
+                        });
+
+                        $rank = 0;                 // current rank number
+                        $position = 0;             // actual position in list
+                        $prev_score = null;        // previous fuzzy score
+
+                        foreach ($students as $key => $stud) {
+                            $position++;
+
+                            // If first student OR score is different → update rank
+                            if ($prev_score === null || $stud["fuzzy_score"] != $prev_score) {
+                                $rank = $position;
+                            }
+
+                            $students[$key]["rank"] = $rank;
+                            $prev_score = $stud["fuzzy_score"];
+                        }
+
+                        foreach ($students as $s) {
+                        echo "
+                        <tr>
+                            <td>{$s['stud_no']}</td>
+                            <td>{$s['fullname']}</td>
+                            <td>{$s['grade_level']}</td>
+                            <td>" . number_format((float)$s['average'], 2, '.', '') . "</td>
+                            <td>" . number_format((float)$s['fuzzy_score'], 2,  '.', '') . "</td>
+                            <td>{$s['rank']}</td>
+                            <td><b>{$s['distinction']}</b></td>
+
+                        </tr>";
+                    }
+                
+                                                                            
+                ?>
+                
+              </tbody>
+              <tfoot>
+              </tfoot>
+            </table>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer"></div>
+          <!-- /.card-footer-->
+        </div>
+        <!-- /.card -->
+
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <?php include '../../includes/footer.php'; ?>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+      <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+  </div>
+  <!-- ./wrapper -->
+
+  <?php include '../../includes/script.php'; ?>
+</body>
+
+</html>
